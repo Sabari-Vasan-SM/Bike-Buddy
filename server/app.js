@@ -9,8 +9,10 @@ app.use(express.json());
 // Connect to MongoDB
 connectDB();
 
+app.get('/', (req, res) => {
+  res.send('API is running');
+});
 // Basic route
-test
 app.get('/', (req, res) => {
   res.send('API is running');
 });
