@@ -18,7 +18,9 @@ function Login() {
       const data = await res.json();
       if (res.ok) {
         localStorage.setItem('user', JSON.stringify({ role: data.role, email: data.email }));
-        if (data.role === 'owner') {
+        if (data.role === 'admin') {
+          navigate('/admin');
+        } else if (data.role === 'owner') {
           navigate('/owner');
         } else {
           navigate('/customer');
@@ -44,6 +46,7 @@ function Login() {
           <select value={role} onChange={(e) => setRole(e.target.value)} className="pill-select">
             <option value="customer">Customer</option>
             <option value="owner">Owner</option>
+            <option value="admin">Admin</option>
           </select>
         </div>
         <input
