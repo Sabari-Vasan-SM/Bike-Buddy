@@ -1,0 +1,309 @@
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Button,
+  Card,
+  CardContent,
+  Typography,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  Chip
+} from '@mui/material';
+import { styled } from '@mui/system';
+
+const DashboardContainer = styled('div')({
+  maxWidth: '1200px',
+  margin: '0 auto',
+  padding: '2rem'
+});
+
+const BookingCard = styled(Card)(({ status }) => ({
+  marginBottom: '1rem',
+  borderLeft: `4px solid ${
+    status === 'Pending' ? '#ffb74d' :
+    status === 'In Progress' ? '#64b5f6' :
+    status === 'Ready for Delivery' ? '#81c784' :
+    '#a5d6a7'
+  }`
+}));
+
+function CustomerDashboard() {
+  const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem('user'));
+  const [bookings, setBookings] = useState([]);
+  const [selectedService, setSelectedService] = useState('');
+  const [bookingDate, setBookingDate] = useState('');
+  const [openDialog, setOpenDialog] = useState(false);
+  const [bookingDetails, setBookingDetails] = useState({
+    name: '',
+    phone: '',
+    address: ''
+  });
+  const [services, setServices] = useState(() => {
+    const storedServices = JSON.parse(localStorage.getItem('services'));
+    return storedServices || [
+      { id: 1, name: 'General Service Check-up', price: '50', duration: '1', description: 'Basic inspection and tune-up' },
+      { id: 2, name: 'Oil Change', price: '30', duration: '0.5', description: 'Engine oil and filter replacement' },
+      { id: 3, name: 'Water Wash', price: '15', duration: '0.5', description: 'Complete bike cleaning' },
+      { id: 4, name: 'Tire Replacement', price: '80', duration: '1', description: 'Tire change and balancing' },
+      { id: 5, name: 'Brake Service', price: '40', duration: '1', description: 'Brake inspection and adjustment' },
+      { id: 6, name: 'Chain Service', price: '25', duration: '0.5', description: 'Chain cleaning and lubrication' }
+    ];
+  });
+
+  useEffect(() => {
+    if (!user || user.role !== 'customer') {
+      navigate('/login');
+    } else {
+      const loadData = () => {
+        const allBookings = JSON.parse(localStorage.getItem('bookings')) || [];
+        const storedServices = JSON.parse(localStorage.getItem('services')) || services;
+        setBookings(allBookings.filter(b => b.email === user.email));
+        setServices(storedServices);
+      };
+
+      loadData();
+
+      const handleStorageChange = (e) => {
+        if (e.key === 'services') {
+          setServices(JSON.parse(e.newValue));
+        }
+        if (e.key === 'bookings') {
+          const allBookings = JSON.parse(e.newValue) || [];
+          setBookings(allBookings.filter(b => b.email === user.email));
+        }
+      };
+
+      window.addEventListener('storage', handleStorageChange);
+      return () => window.removeEventListener('storage', handleStorageChange);
+    }
+  }, [navigate, user, services]);
+
+  const handleOpenDialog = () => {
+    if (!bookingDate || !selectedService) {
+      alert('Please select a service and date');
+      return;
+    }
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setBookingDetails(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleBook = () => {
+    const selectedServiceData = services.find(s => s.name === selectedService);
+    
+    const booking = {
+      id: Date.now(),
+      email: user.email,
+      name: bookingDetails.name,
+      phone: bookingDetails.phone,
+      address: bookingDetails.address,
+      service: selectedService,
+      serviceDetails: selectedServiceData,
+      date: bookingDate,
+      status: 'Pending',
+      timestamp: new Date().toLocaleString(),
+      bookingDate: new Date(bookingDate).toLocaleDateString()
+    };
+
+    const updatedBookings = [...JSON.parse(localStorage.getItem('bookings') || '[]'), booking];
+    localStorage.setItem('bookings', JSON.stringify(updatedBookings));
+    setBookings(updatedBookings.filter(b => b.email === user.email));
+    setSelectedService('');
+    setBookingDate('');
+    setBookingDetails({ name: '', phone: '', address: '' });
+    setOpenDialog(false);
+    alert(`Booking confirmed for ${selectedService} on ${booking.bookingDate}`);
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const updatedBookings = JSON.parse(localStorage.getItem('bookings')) || [];
+      const userBookings = updatedBookings.filter(b => b.email === user?.email);
+      
+      userBookings.forEach(b => {
+        if (b.status === 'Ready for Delivery' && !b.notified) {
+          console.log(`Email notification sent to ${b.email}: Your ${b.service} is ready for delivery!`);
+          b.notified = true;
+          localStorage.setItem('bookings', JSON.stringify(updatedBookings));
+        }
+      });
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [user]);
+
+  return (
+    <DashboardContainer>
+      <Typography variant="h4" gutterBottom>
+        Welcome, {user?.email}
+      </Typography>
+
+      <Card sx={{ mb: 4, p: 2 }}>
+        <Typography variant="h5" gutterBottom>
+          Book a Service
+        </Typography>
+        
+        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+          <FormControl fullWidth sx={{ minWidth: 200 }}>
+            <InputLabel>Select a service</InputLabel>
+            <Select
+              value={selectedService}
+              onChange={(e) => setSelectedService(e.target.value)}
+              label="Select a service"
+            >
+              <MenuItem value="">Select a service</MenuItem>
+              {services.map(service => (
+                <MenuItem key={service.id} value={service.name}>
+                  {service.name} (${service.price}, {service.duration} hrs)
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          
+          <TextField
+            type="date"
+            value={bookingDate}
+            onChange={(e) => setBookingDate(e.target.value)}
+            InputLabelProps={{ shrink: true }}
+            label="Service Date"
+            inputProps={{
+              min: new Date().toISOString().split('T')[0]
+            }}
+          />
+          
+          <Button
+            variant="contained"
+            onClick={handleOpenDialog}
+            disabled={!selectedService || !bookingDate}
+            sx={{ height: '56px' }}
+          >
+            Book Now
+          </Button>
+        </div>
+      </Card>
+
+      <Typography variant="h5" gutterBottom>
+        Your Bookings
+      </Typography>
+      
+      {bookings.length === 0 ? (
+        <Card sx={{ p: 2, textAlign: 'center' }}>
+          <Typography>No bookings yet. Book your first service!</Typography>
+        </Card>
+      ) : (
+        <div>
+          {bookings.map((b) => (
+            <BookingCard key={b.id} status={b.status}>
+              <CardContent>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="h6">{b.service}</Typography>
+                  <Chip 
+                    label={b.status}
+                    color={
+                      b.status === 'Pending' ? 'warning' :
+                      b.status === 'In Progress' ? 'info' :
+                      b.status === 'Ready for Delivery' ? 'success' : 'success'
+                    }
+                  />
+                </div>
+                <Typography variant="body2" color="text.secondary">
+                  Date: {b.bookingDate}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Booked on: {b.timestamp}
+                </Typography>
+                <Typography variant="body2">
+                  Price: ${b.serviceDetails?.price}
+                </Typography>
+                <Typography variant="body2">
+                  Duration: {b.serviceDetails?.duration} hours
+                </Typography>
+                {b.status === 'Ready for Delivery' && (
+                  <div style={{ marginTop: '1rem', padding: '0.5rem', backgroundColor: '#e8f5e9' }}>
+                    <Typography variant="body2">
+                      Your service is ready! Please collect your bike.
+                    </Typography>
+                  </div>
+                )}
+              </CardContent>
+            </BookingCard>
+          ))}
+        </div>
+      )}
+
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <DialogTitle>Confirm Booking Details</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            name="name"
+            label="Full Name"
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={bookingDetails.name}
+            onChange={handleInputChange}
+            required
+          />
+          <TextField
+            margin="dense"
+            name="phone"
+            label="Phone Number"
+            type="tel"
+            fullWidth
+            variant="outlined"
+            value={bookingDetails.phone}
+            onChange={handleInputChange}
+            required
+          />
+          <TextField
+            margin="dense"
+            name="address"
+            label="Address"
+            type="text"
+            fullWidth
+            variant="outlined"
+            multiline
+            rows={3}
+            value={bookingDetails.address}
+            onChange={handleInputChange}
+            required
+          />
+          <Typography variant="subtitle1" sx={{ mt: 2 }}>
+            Service: {selectedService}
+          </Typography>
+          <Typography variant="subtitle1">
+            Date: {new Date(bookingDate).toLocaleDateString()}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog}>Cancel</Button>
+          <Button onClick={handleBook} variant="contained" color="primary">
+            Confirm Booking
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </DashboardContainer>
+  );
+}
+
+export default CustomerDashboard;
