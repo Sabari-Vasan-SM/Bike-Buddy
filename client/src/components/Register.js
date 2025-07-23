@@ -7,20 +7,24 @@ function Register() {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-    const users = JSON.parse(localStorage.getItem('users')) || [];
-    const userExists = users.some((u) => u.email === email);
-
-    if (userExists) {
-      alert('User already exists');
-      return;
+    try {
+      const res = await fetch('http://localhost:5000/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, role: 'customer' })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert('Registration successful!');
+        navigate('/');
+      } else {
+        alert(data.message || 'Registration failed');
+      }
+    } catch (err) {
+      alert('Server error. Please try again later.');
     }
-
-    users.push({ email, password });
-    localStorage.setItem('users', JSON.stringify(users));
-    alert('Registration successful!');
-    navigate('/');
   };
 
   return (
