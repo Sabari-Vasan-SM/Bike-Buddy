@@ -46,45 +46,30 @@ function CustomerDashboard() {
     phone: '',
     address: ''
   });
-  const [services, setServices] = useState(() => {
-    const storedServices = JSON.parse(localStorage.getItem('services'));
-    return storedServices || [
-      { id: 1, name: 'General Service Check-up', price: '50', duration: '1', description: 'Basic inspection and tune-up' },
-      { id: 2, name: 'Oil Change', price: '30', duration: '0.5', description: 'Engine oil and filter replacement' },
-      { id: 3, name: 'Water Wash', price: '15', duration: '0.5', description: 'Complete bike cleaning' },
-      { id: 4, name: 'Tire Replacement', price: '80', duration: '1', description: 'Tire change and balancing' },
-      { id: 5, name: 'Brake Service', price: '40', duration: '1', description: 'Brake inspection and adjustment' },
-      { id: 6, name: 'Chain Service', price: '25', duration: '0.5', description: 'Chain cleaning and lubrication' }
-    ];
-  });
+  const [services, setServices] = useState([]);
 
   useEffect(() => {
     if (!user || user.role !== 'customer') {
       navigate('/login');
     } else {
-      const loadData = () => {
-        const allBookings = JSON.parse(localStorage.getItem('bookings')) || [];
-        const storedServices = JSON.parse(localStorage.getItem('services')) || services;
-        setBookings(allBookings.filter(b => b.email === user.email));
-        setServices(storedServices);
+      const loadData = async () => {
+        try {
+          const [bookingsRes, servicesRes] = await Promise.all([
+            fetch(`http://localhost:5000/api/bookings?email=${user.email}`),
+            fetch('http://localhost:5000/api/services')
+          ]);
+          const bookingsData = await bookingsRes.json();
+          const servicesData = await servicesRes.json();
+          setBookings(bookingsData);
+          setServices(servicesData);
+        } catch (err) {
+          setBookings([]);
+          setServices([]);
+        }
       };
-
       loadData();
-
-      const handleStorageChange = (e) => {
-        if (e.key === 'services') {
-          setServices(JSON.parse(e.newValue));
-        }
-        if (e.key === 'bookings') {
-          const allBookings = JSON.parse(e.newValue) || [];
-          setBookings(allBookings.filter(b => b.email === user.email));
-        }
-      };
-
-      window.addEventListener('storage', handleStorageChange);
-      return () => window.removeEventListener('storage', handleStorageChange);
     }
-  }, [navigate, user, services]);
+  }, [navigate, user]);
 
   const handleOpenDialog = () => {
     if (!bookingDate || !selectedService) {
@@ -106,11 +91,9 @@ function CustomerDashboard() {
     }));
   };
 
-  const handleBook = () => {
+  const handleBook = async () => {
     const selectedServiceData = services.find(s => s.name === selectedService);
-    
     const booking = {
-      id: Date.now(),
       email: user.email,
       name: bookingDetails.name,
       phone: bookingDetails.phone,
@@ -122,33 +105,29 @@ function CustomerDashboard() {
       timestamp: new Date().toLocaleString(),
       bookingDate: new Date(bookingDate).toLocaleDateString()
     };
-
-    const updatedBookings = [...JSON.parse(localStorage.getItem('bookings') || '[]'), booking];
-    localStorage.setItem('bookings', JSON.stringify(updatedBookings));
-    setBookings(updatedBookings.filter(b => b.email === user.email));
-    setSelectedService('');
-    setBookingDate('');
-    setBookingDetails({ name: '', phone: '', address: '' });
-    setOpenDialog(false);
-    alert(`Booking confirmed for ${selectedService} on ${booking.bookingDate}`);
+    try {
+      const res = await fetch('http://localhost:5000/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(booking)
+      });
+      if (res.ok) {
+        const created = await res.json();
+        setBookings([...bookings, created]);
+        setSelectedService('');
+        setBookingDate('');
+        setBookingDetails({ name: '', phone: '', address: '' });
+        setOpenDialog(false);
+        alert(`Booking confirmed for ${selectedService} on ${booking.bookingDate}`);
+      } else {
+        alert('Failed to book service');
+      }
+    } catch (err) {
+      alert('Server error. Please try again later.');
+    }
   };
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const updatedBookings = JSON.parse(localStorage.getItem('bookings')) || [];
-      const userBookings = updatedBookings.filter(b => b.email === user?.email);
-      
-      userBookings.forEach(b => {
-        if (b.status === 'Ready for Delivery' && !b.notified) {
-          console.log(`Email notification sent to ${b.email}: Your ${b.service} is ready for delivery!`);
-          b.notified = true;
-          localStorage.setItem('bookings', JSON.stringify(updatedBookings));
-        }
-      });
-    }, 10000);
-
-    return () => clearInterval(interval);
-  }, [user]);
+  // Notification polling logic can be handled by backend or websockets in future
 
   return (
     <DashboardContainer>
