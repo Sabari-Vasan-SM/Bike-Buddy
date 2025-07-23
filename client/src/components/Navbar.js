@@ -8,8 +8,8 @@ const Navbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('user');
-    navigate('/');  // This will take you to the root route which is <Login />
-    window.location.reload(); // Force reload to reset state
+    navigate('/');
+    window.location.reload();
   };
 
   return (
