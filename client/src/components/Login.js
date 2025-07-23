@@ -7,25 +7,27 @@ function Login() {
   const [role, setRole] = useState('customer');
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-
-    if (role === 'owner') {
-      if (email === 'owner@gmail.com' && password === 'owner') {
-        localStorage.setItem('user', JSON.stringify({ role: 'owner' }));
-        navigate('/owner');
+    try {
+      const res = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, role })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        localStorage.setItem('user', JSON.stringify({ role: data.role, email: data.email }));
+        if (data.role === 'owner') {
+          navigate('/owner');
+        } else {
+          navigate('/customer');
+        }
       } else {
-        alert('Invalid Owner Credentials');
+        alert(data.message || 'Invalid Credentials');
       }
-    } else {
-      const users = JSON.parse(localStorage.getItem('users')) || [];
-      const user = users.find((u) => u.email === email && u.password === password);
-      if (user) {
-        localStorage.setItem('user', JSON.stringify({ role: 'customer', email }));
-        navigate('/customer');
-      } else {
-        alert('Invalid Customer Credentials');
-      }
+    } catch (err) {
+      alert('Server error. Please try again later.');
     }
   };
 
