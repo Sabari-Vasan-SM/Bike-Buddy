@@ -58,98 +58,132 @@ function OwnerDashboard() {
   const [editingService, setEditingService] = useState(null);
   const [selectedBooking, setSelectedBooking] = useState(null);
 
+
   useEffect(() => {
     if (!user || user.role !== 'owner') {
       navigate('/');
     } else {
-      const loadData = () => {
-        const allBookings = JSON.parse(localStorage.getItem('bookings')) || [];
-        const allServices = JSON.parse(localStorage.getItem('services')) || [];
-        setBookings(allBookings);
-        setServices(allServices);
+      const loadData = async () => {
+        try {
+          const [bookingsRes, servicesRes] = await Promise.all([
+            fetch('http://localhost:5000/api/bookings'),
+            fetch('http://localhost:5000/api/services')
+          ]);
+          const bookingsData = await bookingsRes.json();
+          const servicesData = await servicesRes.json();
+          setBookings(bookingsData);
+          setServices(servicesData);
+        } catch (err) {
+          setBookings([]);
+          setServices([]);
+        }
       };
       loadData();
     }
-
     emailjs.init('eLnMDWQJUKn4i4CgN');
   }, [navigate, user]);
 
-  useEffect(() => {
-    const handleStorageChange = (e) => {
-      if (e.key === 'services') {
-        setServices(JSON.parse(e.newValue));
+
+  // No need for localStorage event listener when using backend
+
+
+  const handleStatusChange = async (id, newStatus) => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/bookings/${id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+      if (res.ok) {
+        setBookings(bookings => bookings.map((b) =>
+          b.id === id ? { ...b, status: newStatus } : b
+        ));
+        const booking = bookings.find(b => b.id === id);
+        if (newStatus === "Ready for Delivery" && booking?.email) {
+          console.log(`Email sent to ${booking.email}: Your bike service is ready for delivery!`);
+        }
+        if (newStatus === "Completed" && booking?.email) {
+          const templateParams = {
+            user_email: booking.email,
+            user_message: `Hi, your service for "${booking.service}" is ready for delivery!`,
+            service_name: booking.service,
+            service_date: booking.bookingDate || booking.date,
+            customer_mobile: booking.mobile || ''
+          };
+          emailjs.send('service_2nqfc1z', 'template_gbxcdj8', templateParams)
+            .then((res) => {
+              console.log("Email successfully sent!", res.status, res.text);
+            })
+            .catch((err) => {
+              console.error("Email send failed:", err);
+            });
+        }
+      } else {
+        alert('Failed to update booking status');
       }
-      if (e.key === 'bookings') {
-        setBookings(JSON.parse(e.newValue) || []);
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
-
-  const handleStatusChange = (id, newStatus) => {
-    const updated = bookings.map((b) =>
-      b.id === id ? { ...b, status: newStatus } : b
-    );
-    localStorage.setItem('bookings', JSON.stringify(updated));
-    setBookings(updated);
-
-    const booking = updated.find(b => b.id === id);
-
-    if (newStatus === "Ready for Delivery" && booking?.email) {
-      console.log(`Email sent to ${booking.email}: Your bike service is ready for delivery!`);
-    }
-
-    if (newStatus === "Completed" && booking?.email) {
-      const templateParams = {
-        user_email: booking.email,
-        user_message: `Hi, your service for "${booking.service}" is ready for delivery!`,
-        service_name: booking.service,
-        service_date: booking.bookingDate || booking.date,
-        customer_mobile: booking.mobile || ''
-      };
-
-      emailjs.send('service_2nqfc1z', 'template_gbxcdj8', templateParams)
-        .then((res) => {
-          console.log("Email successfully sent!", res.status, res.text);
-        })
-        .catch((err) => {
-          console.error("Email send failed:", err);
-        });
+    } catch (err) {
+      alert('Server error. Please try again later.');
     }
   };
 
-  const handleAddService = () => {
+
+  const handleAddService = async () => {
     if (!newService.name || !newService.price || !newService.duration) {
       alert('Please fill all required service fields');
       return;
     }
-    
-    const updatedServices = [...services, { 
-      ...newService, 
-      id: Date.now(),
-      description: newService.description || 'No description available'
-    }];
-    
-    localStorage.setItem('services', JSON.stringify(updatedServices));
-    setServices(updatedServices);
-    setNewService({ name: '', price: '', duration: '', description: '' });
+    try {
+      const res = await fetch('http://localhost:5000/api/services', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newService)
+      });
+      if (res.ok) {
+        const created = await res.json();
+        setServices([...services, created]);
+        setNewService({ name: '', price: '', duration: '', description: '' });
+      } else {
+        alert('Failed to add service');
+      }
+    } catch (err) {
+      alert('Server error. Please try again later.');
+    }
   };
 
-  const handleUpdateService = () => {
-    const updatedServices = services.map(s => 
-      s.id === editingService.id ? editingService : s
-    );
-    localStorage.setItem('services', JSON.stringify(updatedServices));
-    setServices(updatedServices);
-    setEditingService(null);
+
+  const handleUpdateService = async () => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/services/${editingService._id || editingService.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editingService)
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setServices(services.map(s => (s._id === updated._id || s.id === updated.id) ? updated : s));
+        setEditingService(null);
+      } else {
+        alert('Failed to update service');
+      }
+    } catch (err) {
+      alert('Server error. Please try again later.');
+    }
   };
 
-  const handleDeleteService = (id) => {
-    const updatedServices = services.filter(s => s.id !== id);
-    localStorage.setItem('services', JSON.stringify(updatedServices));
-    setServices(updatedServices);
+
+  const handleDeleteService = async (id) => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/services/${id}`, {
+        method: 'DELETE'
+      });
+      if (res.ok) {
+        setServices(services.filter(s => s._id !== id && s.id !== id));
+      } else {
+        alert('Failed to delete service');
+      }
+    } catch (err) {
+      alert('Server error. Please try again later.');
+    }
   };
 
   const filteredBookings = filter === 'all' 
