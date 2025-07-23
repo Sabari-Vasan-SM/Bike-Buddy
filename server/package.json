@@ -1,0 +1,16 @@
+{
+  "name": "cartrabbit-server",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.6.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  }
+}
