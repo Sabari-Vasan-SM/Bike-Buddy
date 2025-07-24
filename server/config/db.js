@@ -1,16 +1,18 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose")
+require("dotenv").config() // Load environment variables
 
 const connectDB = async () => {
   try {
-    await mongoose.connect('mongodb+srv://sabari:sabari@cluster0.vqbeakg.mongodb.net/', {
+    await mongoose.connect(process.env.MONGO_URI, {
+      // Use environment variable
       useNewUrlParser: true,
       useUnifiedTopology: true,
-    });
-    console.log('MongoDB connected successfully');
+    })
+    console.log("MongoDB connected successfully")
   } catch (err) {
-    console.error('MongoDB connection error:', err);
-    process.exit(1);
+    console.error("MongoDB connection error:", err)
+    process.exit(1)
   }
-};
+}
 
-module.exports = connectDB;
+module.exports = connectDB
