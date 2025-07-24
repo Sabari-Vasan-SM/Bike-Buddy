@@ -140,13 +140,14 @@ function OwnerDashboard() {
       });
       if (res.ok) {
         const created = await res.json();
-        setServices([...services, created]);
+        setServices(prev => [...prev, created]);
         setNewService({ name: '', price: '', duration: '', description: '' });
       } else {
-        alert('Failed to add service');
+        const errorText = await res.text();
+        alert('Failed to add service: ' + errorText);
       }
     } catch (err) {
-      alert('Server error. Please try again later.');
+      alert('Server error. Please try again later. ' + (err?.message || ''));
     }
   };
 
@@ -270,7 +271,7 @@ function OwnerDashboard() {
               Services List
             </Typography>
             {services.map(service => (
-              <ServiceCard key={service.id}>
+              <ServiceCard key={service._id || service.id}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <div>
                     <Typography variant="subtitle1">{service.name}</Typography>
@@ -291,7 +292,7 @@ function OwnerDashboard() {
                     <Button 
                       size="small" 
                       color="error"
-                      onClick={() => handleDeleteService(service.id)}
+                      onClick={() => handleDeleteService(service._id || service.id)}
                     >
                       Delete
                     </Button>
