@@ -1,4 +1,4 @@
-"use client"
+// "use client"
 
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
@@ -18,7 +18,6 @@ import {
   FormControl,
   Chip,
 } from "@mui/material"
-// Removed styled from @mui/system
 
 function CustomerDashboard() {
   const navigate = useNavigate()
@@ -26,8 +25,10 @@ function CustomerDashboard() {
   const [bookings, setBookings] = useState([])
   const [selectedService, setSelectedService] = useState("")
   const [bookingDate, setBookingDate] = useState("")
-  const [openDialog, setOpenDialog] = useState(false)
-  const [bookingDetails, setBookingDetails] = useState({
+  const [openBookingDialog, setOpenBookingDialog] = useState(false) // Renamed for clarity
+  const [openDetailsDialog, setOpenDetailsDialog] = useState(false) // New state for details dialog
+  const [selectedBookingDetails, setSelectedBookingDetails] = useState(null) // State for selected booking details
+  const [bookingFormDetails, setBookingFormDetails] = useState({
     name: "",
     phone: "",
     address: "",
@@ -58,21 +59,21 @@ function CustomerDashboard() {
     }
   }, [navigate, user])
 
-  const handleOpenDialog = () => {
+  const handleOpenBookingDialog = () => {
     if (!bookingDate || !selectedService) {
       alert("Please select a service and date")
       return
     }
-    setOpenDialog(true)
+    setOpenBookingDialog(true)
   }
 
-  const handleCloseDialog = () => {
-    setOpenDialog(false)
+  const handleCloseBookingDialog = () => {
+    setOpenBookingDialog(false)
   }
 
-  const handleInputChange = (e) => {
+  const handleBookingFormInputChange = (e) => {
     const { name, value } = e.target
-    setBookingDetails((prev) => ({
+    setBookingFormDetails((prev) => ({
       ...prev,
       [name]: value,
     }))
@@ -82,9 +83,9 @@ function CustomerDashboard() {
     const selectedServiceData = services.find((s) => s.name === selectedService)
     const booking = {
       email: user.email,
-      name: bookingDetails.name,
-      phone: bookingDetails.phone,
-      address: bookingDetails.address,
+      name: bookingFormDetails.name,
+      phone: bookingFormDetails.phone,
+      address: bookingFormDetails.address,
       service: selectedService,
       serviceDetails: selectedServiceData,
       date: bookingDate,
@@ -103,8 +104,8 @@ function CustomerDashboard() {
         setBookings([...bookings, created])
         setSelectedService("")
         setBookingDate("")
-        setBookingDetails({ name: "", phone: "", address: "" })
-        setOpenDialog(false)
+        setBookingFormDetails({ name: "", phone: "", address: "" })
+        setOpenBookingDialog(false)
         alert(`Booking confirmed for ${selectedService} on ${booking.bookingDate}`)
       } else {
         alert("Failed to book service")
@@ -114,23 +115,29 @@ function CustomerDashboard() {
     }
   }
 
+  const handleViewDetails = (booking) => {
+    setSelectedBookingDetails(booking)
+    setOpenDetailsDialog(true)
+  }
+
+  const handleCloseDetailsDialog = () => {
+    setOpenDetailsDialog(false)
+    setSelectedBookingDetails(null)
+  }
+
   return (
     <div className="dashboard-container">
-      {" "}
-      {/* Replaced DashboardContainer styled component */}
-      <Typography variant="h4" gutterBottom>
-        Welcome, {user?.email}
+      <Typography variant="h4" gutterBottom sx={{ color: "var(--primary-color)", fontWeight: 600 }}>
+        Welcome, {user?.email}!
       </Typography>
-      <Card sx={{ mb: 4, p: 2 }} className="card">
-        {" "}
-        {/* Added .card class */}
-        <Typography variant="h5" gutterBottom>
+
+      <Card className="card section-card">
+        <Typography variant="h5" gutterBottom sx={{ color: "var(--text-dark)" }}>
           Book a Service
         </Typography>
+
         <div className="service-booking-section">
-          {" "}
-          {/* Replaced inline style */}
-          <FormControl fullWidth sx={{ minWidth: 200 }}>
+          <FormControl fullWidth>
             <InputLabel>Select a service</InputLabel>
             <Select
               value={selectedService}
@@ -139,12 +146,13 @@ function CustomerDashboard() {
             >
               <MenuItem value="">Select a service</MenuItem>
               {services.map((service) => (
-                <MenuItem key={service._id || service.id} value={service.name}>
+                <MenuItem key={service._id} value={service.name}>
                   {service.name} (${service.price}, {service.duration} hrs)
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
+
           <TextField
             type="date"
             value={bookingDate}
@@ -154,35 +162,41 @@ function CustomerDashboard() {
             inputProps={{
               min: new Date().toISOString().split("T")[0],
             }}
+            fullWidth
           />
+
           <Button
             variant="contained"
-            onClick={handleOpenDialog}
+            onClick={handleOpenBookingDialog}
             disabled={!selectedService || !bookingDate}
-            sx={{ height: "56px" }}
+            sx={{ height: "56px", minWidth: "150px" }}
           >
             Book Now
           </Button>
         </div>
       </Card>
-      <Typography variant="h5" gutterBottom>
+
+      <Typography variant="h5" gutterBottom sx={{ color: "var(--text-dark)" }}>
         Your Bookings
       </Typography>
+
       {bookings.length === 0 ? (
-        <Card sx={{ p: 2, textAlign: "center" }} className="card">
-          {" "}
-          {/* Added .card class */}
+        <Card className="card section-card no-bookings-message">
           <Typography>No bookings yet. Book your first service!</Typography>
         </Card>
       ) : (
         <div>
-          {bookings.map((b) => (
-            <Card key={b._id || b.id} className={`booking-card status-${b.status.replace(/\s/g, "")}`}>
-              {" "}
-              {/* Replaced BookingCard styled component */}
+          {bookings.map((b, index) => (
+            <Card
+              key={b._id}
+              className={`booking-card status-${b.status.replace(/\s/g, "")}`}
+              sx={{ animationDelay: `${index * 0.05}s` }}
+            >
               <CardContent>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <Typography variant="h6">{b.service}</Typography>
+                <div className="booking-card-header">
+                  <Typography variant="h6" sx={{ color: "var(--text-dark)" }}>
+                    {b.service}
+                  </Typography>
                   <Chip
                     label={b.status}
                     color={
@@ -192,8 +206,9 @@ function CustomerDashboard() {
                           ? "info"
                           : b.status === "Ready for Delivery"
                             ? "success"
-                            : "success"
+                            : "primary" // Use primary for completed
                     }
+                    sx={{ fontWeight: "bold" }}
                   />
                 </div>
                 <Typography variant="body2" color="text.secondary">
@@ -202,21 +217,39 @@ function CustomerDashboard() {
                 <Typography variant="body2" color="text.secondary">
                   Booked on: {b.timestamp}
                 </Typography>
-                <Typography variant="body2">Price: ${b.serviceDetails?.price}</Typography>
-                <Typography variant="body2">Duration: {b.serviceDetails?.duration} hours</Typography>
+                <Typography variant="body2" sx={{ mt: 1 }}>
+                  Price: ${b.serviceDetails?.price} | Duration: {b.serviceDetails?.duration} hours
+                </Typography>
                 {b.status === "Ready for Delivery" && (
                   <div className="service-ready-message">
-                    {" "}
-                    {/* Replaced inline style */}
                     <Typography variant="body2">Your service is ready! Please collect your bike.</Typography>
                   </div>
                 )}
+                <Button variant="outlined" size="small" sx={{ mt: 2 }} onClick={() => handleViewDetails(b)}>
+                  View Details
+                </Button>
               </CardContent>
             </Card>
           ))}
         </div>
       )}
-      <Dialog open={openDialog} onClose={handleCloseDialog}>
+
+      {/* New Contact Support Section */}
+      <div className="contact-support-section">
+        <Typography variant="h5" gutterBottom>
+          Need Assistance?
+        </Typography>
+        <Typography variant="body1">
+          If you have any questions or need support with your bookings, feel free to reach out to us.
+        </Typography>
+        <Typography variant="body1">
+          Email: <a href="mailto:support@cartrabbit.com">support@cartrabbit.com</a>
+        </Typography>
+        <Typography variant="body1">Phone: +1 (555) 123-4567</Typography>
+      </div>
+
+      {/* Booking Confirmation Dialog */}
+      <Dialog open={openBookingDialog} onClose={handleCloseBookingDialog}>
         <DialogTitle>Confirm Booking Details</DialogTitle>
         <DialogContent>
           <TextField
@@ -227,8 +260,8 @@ function CustomerDashboard() {
             type="text"
             fullWidth
             variant="outlined"
-            value={bookingDetails.name}
-            onChange={handleInputChange}
+            value={bookingFormDetails.name}
+            onChange={handleBookingFormInputChange}
             required
           />
           <TextField
@@ -238,8 +271,8 @@ function CustomerDashboard() {
             type="tel"
             fullWidth
             variant="outlined"
-            value={bookingDetails.phone}
-            onChange={handleInputChange}
+            value={bookingFormDetails.phone}
+            onChange={handleBookingFormInputChange}
             required
           />
           <TextField
@@ -251,8 +284,8 @@ function CustomerDashboard() {
             variant="outlined"
             multiline
             rows={3}
-            value={bookingDetails.address}
-            onChange={handleInputChange}
+            value={bookingFormDetails.address}
+            onChange={handleBookingFormInputChange}
             required
           />
           <Typography variant="subtitle1" sx={{ mt: 2 }}>
@@ -261,11 +294,77 @@ function CustomerDashboard() {
           <Typography variant="subtitle1">Date: {new Date(bookingDate).toLocaleDateString()}</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog}>Cancel</Button>
+          <Button onClick={handleCloseBookingDialog}>Cancel</Button>
           <Button onClick={handleBook} variant="contained" color="primary">
             Confirm Booking
           </Button>
         </DialogActions>
+      </Dialog>
+
+      {/* Booking Details Dialog (New) */}
+      <Dialog open={openDetailsDialog} onClose={handleCloseDetailsDialog} maxWidth="sm" fullWidth>
+        {selectedBookingDetails && (
+          <>
+            <DialogTitle>Booking Details</DialogTitle>
+            <DialogContent dividers>
+              <Typography variant="h6" gutterBottom>
+                {selectedBookingDetails.service}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Customer:</strong> {selectedBookingDetails.name} ({selectedBookingDetails.email})
+              </Typography>
+              <Typography variant="body1">
+                <strong>Phone:</strong> {selectedBookingDetails.phone}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Address:</strong> {selectedBookingDetails.address}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Service Date:</strong> {selectedBookingDetails.bookingDate || selectedBookingDetails.date}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Booked On:</strong> {selectedBookingDetails.timestamp}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Status:</strong>{" "}
+                <Chip
+                  label={selectedBookingDetails.status}
+                  color={
+                    selectedBookingDetails.status === "Pending"
+                      ? "warning"
+                      : selectedBookingDetails.status === "In Progress"
+                        ? "info"
+                        : selectedBookingDetails.status === "Ready for Delivery"
+                          ? "success"
+                          : "primary"
+                  }
+                  size="small"
+                />
+              </Typography>
+              {selectedBookingDetails.serviceDetails && (
+                <div style={{ marginTop: "1rem", borderTop: "1px solid #eee", paddingTop: "1rem" }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                    Service Plan Details:
+                  </Typography>
+                  <Typography variant="body2">Price: ${selectedBookingDetails.serviceDetails.price}</Typography>
+                  <Typography variant="body2">
+                    Duration: {selectedBookingDetails.serviceDetails.duration} hours
+                  </Typography>
+                  {selectedBookingDetails.serviceDetails.description && (
+                    <Typography variant="body2">
+                      Description: {selectedBookingDetails.serviceDetails.description}
+                    </Typography>
+                  )}
+                </div>
+              )}
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseDetailsDialog} variant="contained">
+                Close
+              </Button>
+            </DialogActions>
+          </>
+        )}
       </Dialog>
     </div>
   )

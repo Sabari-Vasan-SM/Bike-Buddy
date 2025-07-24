@@ -40,8 +40,8 @@ function Register() {
           style={{ marginBottom: "1rem", width: "100%", padding: "0.5rem" }}
         >
           <option value="customer">Customer</option>
-          {/* <option value="owner">Owner</option>
-          <option value="admin">Admin</option> */}
+          <option value="owner">Owner</option>
+          <option value="admin">Admin</option>
         </select>
         <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         <input
@@ -51,7 +51,9 @@ function Register() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <button type="submit">Register</button>
+        <button type="submit" variant="contained">
+          Register
+        </button>
       </form>
       <p>
         Already have an account? <a href="/">Login</a>

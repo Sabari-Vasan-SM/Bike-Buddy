@@ -3,54 +3,58 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
-  background-color: #2c3e50;
+  padding: 1rem 3rem;
+  background-color: var(--primary-color);
   color: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  animation: fadeIn 0.8s ease-in-out; /* Added animation */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.8s ease-in-out;
 }
 
 .navbar-brand {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   font-weight: bold;
   cursor: pointer;
-  transition: transform 0.3s ease; /* Added transition */
+  transition: transform 0.3s ease;
+  color: white; /* Ensure brand text is white */
 }
 
 .navbar-brand:hover {
-  transform: scale(1.02); /* Subtle scale on hover */
+  transform: scale(1.03);
 }
 
 .nav-links {
   display: flex;
-  gap: 1.5rem;
+  gap: 2rem;
   align-items: center;
 }
 
 .nav-links span {
   cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 4px;
-  transition: background-color 0.3s, transform 0.3s; /* Added transform transition */
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  transition: background-color 0.3s, transform 0.3s;
+  color: white; /* Ensure nav links are white */
+  font-weight: 500;
 }
 
 .nav-links span:hover {
-  background-color: #34495e;
-  transform: translateY(-2px); /* Subtle lift on hover */
+  background-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
 }
 
 .nav-links button {
-  background-color: #e74c3c;
+  background-color: #dc3545; /* Red for logout */
   color: white;
   border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s; /* Added transitions */
+  transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+  font-weight: 500;
 }
 
 .nav-links button:hover {
-  background-color: #c0392b;
-  transform: translateY(-2px); /* Subtle lift on hover */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Added shadow */
+  background-color: #c82333;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }

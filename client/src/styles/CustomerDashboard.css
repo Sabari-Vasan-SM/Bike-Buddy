@@ -1,56 +1,111 @@
 /* src/styles/CustomerDashboard.css */
 .dashboard-container {
   max-width: 1200px;
-  margin: 0 auto;
+  margin: 2rem auto;
   padding: 2rem;
-  animation: fadeIn 0.8s ease-in-out; /* Added animation */
+  animation: fadeIn 0.8s ease-in-out;
+  background-color: var(--background-light);
+  border-radius: 12px;
 }
 
-.booking-card {
-  margin-bottom: 1rem;
-  border-left: 4px solid;
-  transition: all 0.3s ease; /* Added transition */
+.section-card {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  animation: fadeInUp 0.6s ease-out forwards;
+  opacity: 0;
 }
 
-.booking-card.status-Pending {
-  border-color: #ffb74d;
+.section-card:nth-of-type(1) {
+  animation-delay: 0.1s;
 }
-
-.booking-card.status-InProgress {
-  border-color: #64b5f6;
-}
-
-.booking-card.status-ReadyForDelivery {
-  border-color: #81c784;
-}
-
-.booking-card.status-Completed {
-  border-color: #a5d6a7;
-}
-
-.booking-card:hover {
-  transform: translateY(-3px); /* Subtle lift on hover */
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15); /* Enhanced shadow */
+.section-card:nth-of-type(2) {
+  animation-delay: 0.2s;
 }
 
 .service-booking-section {
   display: flex;
-  gap: 1rem;
   flex-wrap: wrap;
-  align-items: flex-end; /* Align items at the bottom */
+  gap: 1.5rem;
+  align-items: flex-end;
 }
 
 .service-booking-section .MuiFormControl-root,
 .service-booking-section .MuiTextField-root {
-  flex: 1; /* Allow items to grow */
-  min-width: 200px; /* Minimum width for form controls */
+  flex: 1;
+  min-width: 220px;
+}
+
+.booking-card {
+  margin-bottom: 1rem;
+  border-left: 5px solid;
+  transition: all 0.3s ease;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px var(--shadow-light);
+  animation: fadeInUp 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+.booking-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px var(--shadow-medium);
+}
+
+.booking-card.status-Pending {
+  border-color: #ffc107; /* Warning yellow */
+}
+
+.booking-card.status-InProgress {
+  border-color: #17a2b8; /* Info blue */
+}
+
+.booking-card.status-ReadyForDelivery {
+  border-color: #28a745; /* Success green */
+}
+
+.booking-card.status-Completed {
+  border-color: #6f42c1; /* Purple for completed */
+}
+
+.booking-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
 }
 
 .service-ready-message {
   margin-top: 1rem;
-  padding: 0.75rem;
-  background-color: #e8f5e9; /* Light green background */
-  border-radius: 4px;
-  border: 1px solid #c8e6c9;
-  animation: fadeIn 0.5s ease-in-out; /* Fade in message */
+  padding: 0.75rem 1rem;
+  background-color: #d4edda; /* Light green */
+  color: #155724; /* Dark green text */
+  border-radius: 8px;
+  border: 1px solid #c3e6cb;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.no-bookings-message {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-muted);
+}
+
+.contact-support-section {
+  margin-top: 3rem;
+  padding: 2rem;
+  background-color: var(--background-card);
+  border-radius: 12px;
+  box-shadow: 0 4px 15px var(--shadow-light);
+  animation: fadeInUp 0.6s ease-out forwards;
+  opacity: 0;
+  animation-delay: 0.3s;
+}
+
+.contact-support-section h5 {
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.contact-support-section p {
+  margin-bottom: 0.5rem;
+  color: var(--text-dark);
 }
