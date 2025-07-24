@@ -502,7 +502,7 @@ function OwnerDashboard() {
                   <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
                     Service Plan Details:
                   </Typography>
-                  <Typography variant="body2">Price: ${selectedBooking.serviceDetails.price}</Typography>
+                  <Typography variant="body2">Price: ₹{selectedBooking.serviceDetails.price}</Typography>
                   <Typography variant="body2">Duration: {selectedBooking.serviceDetails.duration} hours</Typography>
                   {selectedBooking.serviceDetails.description && (
                     <Typography variant="body2">Description: {selectedBooking.serviceDetails.description}</Typography>
