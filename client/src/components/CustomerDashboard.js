@@ -218,7 +218,7 @@ function CustomerDashboard() {
                   Booked on: {b.timestamp}
                 </Typography>
                 <Typography variant="body2" sx={{ mt: 1 }}>
-                  Price: ${b.serviceDetails?.price} | Duration: {b.serviceDetails?.duration} hours
+                  Price: ₹{b.serviceDetails?.price} | Duration: {b.serviceDetails?.duration} hours
                 </Typography>
                 {b.status === "Ready for Delivery" && (
                   <div className="service-ready-message">
@@ -346,7 +346,7 @@ function CustomerDashboard() {
                   <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
                     Service Plan Details:
                   </Typography>
-                  <Typography variant="body2">Price: ${selectedBookingDetails.serviceDetails.price}</Typography>
+                  <Typography variant="body2">Price: ₹{selectedBookingDetails.serviceDetails.price}</Typography>
                   <Typography variant="body2">
                     Duration: {selectedBookingDetails.serviceDetails.duration} hours
                   </Typography>
