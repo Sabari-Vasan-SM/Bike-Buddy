@@ -150,7 +150,7 @@ function CustomerDashboard() {
             >
               <MenuItem value="">Select a service</MenuItem>
               {services.map(service => (
-                <MenuItem key={service.id} value={service.name}>
+                <MenuItem key={service._id || service.id} value={service.name}>
                   {service.name} (${service.price}, {service.duration} hrs)
                 </MenuItem>
               ))}
