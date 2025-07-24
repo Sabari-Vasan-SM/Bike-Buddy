@@ -1,0 +1,111 @@
+/* src/styles/OwnerDashboard.css */
+.owner-dashboard-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  animation: fadeIn 0.8s ease-in-out; /* Added animation */
+}
+
+.owner-dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+@media (max-width: 992px) {
+  .owner-dashboard-grid {
+    grid-template-columns: 1fr; /* Stack columns on smaller screens */
+  }
+}
+
+.service-management-card {
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.service-list-card {
+  padding: 2rem;
+}
+
+.service-form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.service-card {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  transition: all 0.3s ease; /* Added transition */
+  border-radius: 8px; /* Ensure consistent border-radius */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+}
+
+.service-card:hover {
+  transform: translateY(-3px); /* Subtle lift on hover */
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15); /* Enhanced shadow */
+}
+
+.service-card-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.service-card-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.bookings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.booking-card {
+  margin-bottom: 1rem;
+  border-left: 4px solid;
+  transition: all 0.3s ease; /* Added transition */
+}
+
+.booking-card.status-Pending {
+  border-color: #ffb74d;
+}
+
+.booking-card.status-InProgress {
+  border-color: #64b5f6;
+}
+
+.booking-card.status-ReadyForDelivery {
+  border-color: #81c784;
+}
+
+.booking-card.status-Completed {
+  border-color: #a5d6a7;
+}
+
+.booking-card:hover {
+  transform: translateY(-3px); /* Subtle lift on hover */
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15); /* Enhanced shadow */
+}
+
+.booking-card-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.booking-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.booking-card-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}

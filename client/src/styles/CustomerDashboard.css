@@ -1,0 +1,56 @@
+/* src/styles/CustomerDashboard.css */
+.dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  animation: fadeIn 0.8s ease-in-out; /* Added animation */
+}
+
+.booking-card {
+  margin-bottom: 1rem;
+  border-left: 4px solid;
+  transition: all 0.3s ease; /* Added transition */
+}
+
+.booking-card.status-Pending {
+  border-color: #ffb74d;
+}
+
+.booking-card.status-InProgress {
+  border-color: #64b5f6;
+}
+
+.booking-card.status-ReadyForDelivery {
+  border-color: #81c784;
+}
+
+.booking-card.status-Completed {
+  border-color: #a5d6a7;
+}
+
+.booking-card:hover {
+  transform: translateY(-3px); /* Subtle lift on hover */
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15); /* Enhanced shadow */
+}
+
+.service-booking-section {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: flex-end; /* Align items at the bottom */
+}
+
+.service-booking-section .MuiFormControl-root,
+.service-booking-section .MuiTextField-root {
+  flex: 1; /* Allow items to grow */
+  min-width: 200px; /* Minimum width for form controls */
+}
+
+.service-ready-message {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background-color: #e8f5e9; /* Light green background */
+  border-radius: 4px;
+  border: 1px solid #c8e6c9;
+  animation: fadeIn 0.5s ease-in-out; /* Fade in message */
+}

@@ -1,35 +1,37 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+"use client"
+
+import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [role, setRole] = useState('customer');
-  const navigate = useNavigate();
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [role, setRole] = useState("customer")
+  const navigate = useNavigate()
 
   const handleLogin = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
     try {
-      const res = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, role })
-      });
-      const data = await res.json();
+      const res = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, role }),
+      })
+      const data = await res.json()
       if (res.ok) {
-        localStorage.setItem('user', JSON.stringify({ role: data.role, email: data.email }));
-        if (data.role === 'owner') {
-          navigate('/owner');
+        localStorage.setItem("user", JSON.stringify({ role: data.role, email: data.email }))
+        if (data.role === "owner") {
+          navigate("/owner")
         } else {
-          navigate('/customer');
+          navigate("/customer")
         }
       } else {
-        alert(data.message || 'Invalid Credentials');
+        alert(data.message || "Invalid Credentials")
       }
     } catch (err) {
-      alert('Server error. Please try again later.');
+      alert("Server error. Please try again later.")
     }
-  };
+  }
 
   return (
     <div className="login-container">
@@ -46,13 +48,7 @@ function Login() {
             <option value="owner">Owner</option>
           </select>
         </div>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         <input
           type="password"
           placeholder="Password"
@@ -62,9 +58,11 @@ function Login() {
         />
         <button type="submit">Login</button>
       </form>
-      <p>Don't have an account? <a href="/register">Register here</a></p>
+      <p>
+        Don't have an account? <a href="/register">Register here</a>
+      </p>
     </div>
-  );
+  )
 }
 
-export default Login;
+export default Login
