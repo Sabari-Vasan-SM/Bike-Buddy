@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom"
 function Register() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [role, setRole] = useState("customer")
+  const role = "customer"
   const navigate = useNavigate()
 
   const handleRegister = async (e) => {
@@ -32,17 +32,9 @@ function Register() {
 
   return (
     <div className="login-container">
-      <h2>Register</h2>
+      <h2>Welcome New Customer</h2>
       <form onSubmit={handleRegister}>
-        <select
-          value={role}
-          onChange={(e) => setRole(e.target.value)}
-          style={{ marginBottom: "1rem", width: "100%", padding: "0.5rem" }}
-        >
-          <option value="customer">Customer</option>
-          <option value="owner">Owner</option>
-          <option value="admin">Admin</option>
-        </select>
+        {/* Role is always 'customer' now, dropdown removed */}
         <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         <input
           type="password"

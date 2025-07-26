@@ -33,10 +33,15 @@ function Login() {
     }
   }
 
+  // Choose icon based on role
+  const iconUrl = role === "owner"
+    ? "https://cdn-icons-png.flaticon.com/128/8598/8598993.png"
+    : "https://cdn-icons-png.flaticon.com/128/296/296210.png"
+
   return (
     <div className="login-container">
       <img
-        src="https://cdn-icons-png.flaticon.com/128/8598/8598957.png" // you can change to your own image
+        src={iconUrl}
         alt="User Icon"
         className="login-image"
       />

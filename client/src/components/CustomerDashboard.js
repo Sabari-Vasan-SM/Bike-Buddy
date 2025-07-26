@@ -243,7 +243,7 @@ function CustomerDashboard() {
           If you have any questions or need support with your bookings, feel free to reach out to us.
         </Typography>
         <Typography variant="body1">
-          Email: <a href="mailto:support@cartrabbit.com">support@cartrabbit.com</a>
+          Email: <a href="mailto:support@cartrabbitbikeservice.com">support@cartrabbitbikeservice.com</a>
         </Typography>
         <Typography variant="body1">Phone: +1 (555) 123-4567</Typography>
       </div>
