@@ -214,22 +214,22 @@ function OwnerDashboard() {
       </Typography>
 
       {/* Dashboard Overview */}
-      <Card className="card dashboard-overview-card">
-        <Typography variant="h5" gutterBottom sx={{ color: "white" }}>
+      <Card className="card dashboard-overview-card" sx={{ backgroundColor: "#fff" }}>
+        <Typography variant="h5" gutterBottom sx={{ color: "black", fontWeight: 600 }}>
           Dashboard Overview
         </Typography>
         <div className="overview-grid">
-          <div className="overview-item">
-            <Typography variant="h6">{totalServices}</Typography>
-            <Typography variant="body1">Total Services</Typography>
+          <div className="overview-item" style={{ background: "#fff" }}>
+            <Typography variant="h6" sx={{ color: "black !important", fontWeight: 700 }}>{totalServices}</Typography>
+            <Typography variant="body1" sx={{ color: "black !important", opacity: 0.85 }}>Total Services</Typography>
           </div>
-          <div className="overview-item">
-            <Typography variant="h6">{totalBookings}</Typography>
-            <Typography variant="body1">Total Bookings</Typography>
+          <div className="overview-item" style={{ background: "#fff" }}>
+            <Typography variant="h6" sx={{ color: "black !important", fontWeight: 700 }}>{totalBookings}</Typography>
+            <Typography variant="body1" sx={{ color: "black !important", opacity: 0.85 }}>Total Bookings</Typography>
           </div>
-          <div className="overview-item">
-            <Typography variant="h6">{pendingBookings}</Typography>
-            <Typography variant="body1">Pending Bookings</Typography>
+          <div className="overview-item" style={{ background: "#fff" }}>
+            <Typography variant="h6" sx={{ color: "black !important", fontWeight: 700 }}>{pendingBookings}</Typography>
+            <Typography variant="body1" sx={{ color: "black !important", opacity: 0.85 }}>Pending Bookings</Typography>
           </div>
         </div>
       </Card>
