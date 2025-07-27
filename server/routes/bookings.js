@@ -53,31 +53,43 @@ router.patch("/:id/status", async (req, res) => {
   const booking = await Booking.findByIdAndUpdate(bookingId, { status }, { new: true })
   if (!booking) return res.status(404).send("Booking not found")
 
-  // Send email if status is "Ready for Delivery"
-  if (status === "Ready for Delivery" && booking.email) {
-    // Setup transporter
+  // Send email if status is "In Progress", "Ready for Delivery", or "Completed"
+  const notifyStatuses = ["In Progress", "Ready for Delivery", "Completed"]
+  if (notifyStatuses.includes(status) && booking.email) {
     const transporter = nodemailer.createTransport({
-      service: "gmail", // or your SMTP
+      service: "gmail",
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
     })
 
-    // Email options
+    // Customize subject and message based on status
+    let subject = ""
+    let text = ""
+    if (status === "In Progress") {
+      subject = "Your Bike Service is In Progress"
+      text = `Hi ${booking.name || booking.email}, your service for "${booking.service}" is now in progress. Scheduled date: ${booking.bookingDate || booking.date}`
+    } else if (status === "Ready for Delivery") {
+      subject = "Your Bike Service is Ready for Delivery!"
+      text = `Hi ${booking.name || booking.email}, your service for "${booking.service}" is ready for delivery! Scheduled date: ${booking.bookingDate || booking.date}`
+    } else if (status === "Completed") {
+      subject = "Your Bike Service is Completed"
+      text = `Hi ${booking.name || booking.email}, your service for "${booking.service}" has been completed. Thank you for choosing us!`
+    }
+
     const mailOptions = {
       from: process.env.SMTP_USER,
       to: booking.email,
-      subject: "Your Bike Service is Ready for Delivery!",
-      text: `Hi ${booking.name || booking.email}, your service for "${booking.service}" is ready for delivery! Scheduled date: ${booking.bookingDate || booking.date}`,
+      subject,
+      text,
     }
 
-    // Send email
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
-        console.error("Nodemailer error:", error); // Check your terminal for this!
+        console.error("Nodemailer error:", error)
       } else {
-        console.log("Email sent:", info.response);
+        console.log("Email sent:", info.response)
       }
     })
   }
