@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import emailjs from "emailjs-com"
 import {
   Card,
   CardContent,
@@ -58,8 +57,6 @@ function OwnerDashboard() {
       }
       loadData()
     }
-    // Initialize EmailJS with public key from environment variable
-    emailjs.init(process.env.REACT_APP_EMAILJS_PUBLIC_KEY)
   }, [navigate, user])
 
   const handleStatusChange = async (id, newStatus, customerEmail, serviceName, bookingDate, customerMobile) => {
@@ -72,27 +69,10 @@ function OwnerDashboard() {
       if (res.ok) {
         setBookings((bookings) =>
           bookings.map(
-            (b) => (b._id === id ? { ...b, status: newStatus } : b), // Use _id for MongoDB
+            (b) => (b._id === id ? { ...b, status: newStatus } : b),
           ),
         )
-
-        if (newStatus === "Ready for Delivery" && customerEmail) {
-          const templateParams = {
-            user_email: customerEmail,
-            user_message: `Hi, your service for "${serviceName}" is ready for delivery!`,
-            service_name: serviceName,
-            service_date: bookingDate,
-            customer_mobile: customerMobile || "",
-          }
-          emailjs
-            .send(process.env.REACT_APP_EMAILJS_SERVICE_ID, process.env.REACT_APP_EMAILJS_TEMPLATE_ID, templateParams)
-            .then((res) => {
-              console.log("Email successfully sent!", res.status, res.text)
-            })
-            .catch((err) => {
-              console.error("Email send failed:", err)
-            })
-        }
+        // Email will now be sent by backend
       } else {
         alert("Failed to update booking status")
       }
