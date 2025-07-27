@@ -10,14 +10,33 @@ import {
   TextField,
   Button,
   Card,
-  CardContent,
   Typography,
   Select,
   MenuItem,
   InputLabel,
   FormControl,
   Chip,
+  Divider,
+  Box,
+  Grid,
+  Avatar,
+  Paper,
+  Stack,
+  IconButton
 } from "@mui/material"
+import {
+  DirectionsBike as BikeIcon,
+  CalendarToday as CalendarIcon,
+  SupportAgent as SupportIcon,
+  Info as InfoIcon,
+  Close as CloseIcon,
+  Person as PersonIcon,
+  Phone as PhoneIcon,
+  Home as HomeIcon,
+  CheckCircle as CheckCircleIcon,
+  Schedule as ScheduleIcon,
+  Receipt as ReceiptIcon
+} from "@mui/icons-material"
 
 function CustomerDashboard() {
   const navigate = useNavigate()
@@ -25,9 +44,9 @@ function CustomerDashboard() {
   const [bookings, setBookings] = useState([])
   const [selectedService, setSelectedService] = useState("")
   const [bookingDate, setBookingDate] = useState("")
-  const [openBookingDialog, setOpenBookingDialog] = useState(false) // Renamed for clarity
-  const [openDetailsDialog, setOpenDetailsDialog] = useState(false) // New state for details dialog
-  const [selectedBookingDetails, setSelectedBookingDetails] = useState(null) // State for selected booking details
+  const [openBookingDialog, setOpenBookingDialog] = useState(false)
+  const [openDetailsDialog, setOpenDetailsDialog] = useState(false)
+  const [selectedBookingDetails, setSelectedBookingDetails] = useState(null)
   const [bookingFormDetails, setBookingFormDetails] = useState({
     name: "",
     phone: "",
@@ -45,12 +64,9 @@ function CustomerDashboard() {
             fetch(`http://localhost:5000/api/bookings?email=${user.email}`),
             fetch("http://localhost:5000/api/services"),
           ])
-          const bookingsData = await bookingsRes.json()
-          const servicesData = await servicesRes.json()
-          setBookings(bookingsData)
-          setServices(servicesData)
+          setBookings(await bookingsRes.json())
+          setServices(await servicesRes.json())
         } catch (err) {
-          console.error("Failed to load data:", err)
           setBookings([])
           setServices([])
         }
@@ -67,16 +83,11 @@ function CustomerDashboard() {
     setOpenBookingDialog(true)
   }
 
-  const handleCloseBookingDialog = () => {
-    setOpenBookingDialog(false)
-  }
+  const handleCloseBookingDialog = () => setOpenBookingDialog(false)
 
   const handleBookingFormInputChange = (e) => {
     const { name, value } = e.target
-    setBookingFormDetails((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
+    setBookingFormDetails((prev) => ({ ...prev, [name]: value }))
   }
 
   const handleBook = async () => {
@@ -125,240 +136,333 @@ function CustomerDashboard() {
     setSelectedBookingDetails(null)
   }
 
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "Pending": return "warning"
+      case "In Progress": return "info"
+      case "Ready for Delivery": return "success"
+      default: return "primary"
+    }
+  }
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case "Ready for Delivery": return <CheckCircleIcon />
+      case "In Progress": return <ScheduleIcon />
+      default: return <ReceiptIcon />
+    }
+  }
+
   return (
-    <div className="dashboard-container">
-      <Typography variant="h4" gutterBottom sx={{ color: "var(--primary-color)", fontWeight: 600 }}>
-        Welcome, {user?.email}!
-      </Typography>
-
-      <Card className="card section-card">
-        <Typography variant="h5" gutterBottom sx={{ color: "var(--text-dark)" }}>
-          Book a Service
-        </Typography>
-
-        <div className="service-booking-section">
-          <FormControl fullWidth>
-            <InputLabel>Select a service</InputLabel>
-            <Select
-              value={selectedService}
-              onChange={(e) => setSelectedService(e.target.value)}
-              label="Select a service"
-            >
-              <MenuItem value="">Select a service</MenuItem>
-              {services.map((service) => (
-                <MenuItem key={service._id} value={service.name}>
-                  {service.name} (${service.price}, {service.duration} hrs)
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <TextField
-            type="date"
-            value={bookingDate}
-            onChange={(e) => setBookingDate(e.target.value)}
-            InputLabelProps={{ shrink: true }}
-            label="Service Date"
-            inputProps={{
-              min: new Date().toISOString().split("T")[0],
-            }}
-            fullWidth
-          />
-
-          <Button
-            variant="contained"
-            onClick={handleOpenBookingDialog}
-            disabled={!selectedService || !bookingDate}
-            sx={{ height: "56px", minWidth: "150px" }}
-          >
-            Book Now
-          </Button>
-        </div>
+    <Box sx={{ maxWidth: 1200, mx: 'auto', p: { xs: 2, md: 4 } }}>
+      {/* Welcome Section */}
+      <Card sx={{ mb: 4, p: 3, borderRadius: 3, bgcolor: 'primary.light' }}>
+        <Stack direction="row" alignItems="center" spacing={2}>
+          <Avatar sx={{ bgcolor: 'primary.main', width: 56, height: 56 }}>
+            <BikeIcon fontSize="large" />
+          </Avatar>
+          <Box>
+            <Typography variant="h5" fontWeight="bold">
+              Welcome back, {user?.email.split('@')[0]}!
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Book and manage your bike services with ease
+            </Typography>
+          </Box>
+        </Stack>
       </Card>
 
-      <Typography variant="h5" gutterBottom sx={{ color: "var(--text-dark)" }}>
-        Your Bookings
-      </Typography>
+      {/* Main Content Grid */}
+      <Grid container spacing={3}>
+        {/* Book Service Section */}
+        <Grid item xs={12} md={4}>
+          <Card sx={{ p: 3, height: '100%', borderRadius: 3 }}>
+            <Stack spacing={3}>
+              <Stack direction="row" alignItems="center" spacing={1}>
+                <CalendarIcon color="primary" />
+                <Typography variant="h6" fontWeight="bold">
+                  Book a Service
+                </Typography>
+              </Stack>
+              <Divider />
+              
+              <FormControl fullWidth>
+                <InputLabel>Select Service</InputLabel>
+                <Select
+                  value={selectedService}
+                  onChange={(e) => setSelectedService(e.target.value)}
+                  label="Select Service"
+                >
+                  <MenuItem value="">Select a service</MenuItem>
+                  {services.map((service) => (
+                    <MenuItem key={service._id} value={service.name}>
+                      {service.name} (${service.price}, {service.duration} hrs)
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              
+              <TextField
+                type="date"
+                value={bookingDate}
+                onChange={(e) => setBookingDate(e.target.value)}
+                InputLabelProps={{ shrink: true }}
+                label="Service Date"
+                inputProps={{ min: new Date().toISOString().split("T")[0] }}
+                fullWidth
+              />
+              
+              <Button
+                variant="contained"
+                size="large"
+                onClick={handleOpenBookingDialog}
+                disabled={!selectedService || !bookingDate}
+                sx={{ py: 1.5 }}
+              >
+                Continue Booking
+              </Button>
+            </Stack>
+          </Card>
+        </Grid>
 
-      {bookings.length === 0 ? (
-        <Card className="card section-card no-bookings-message">
-          <Typography>No bookings yet. Book your first service!</Typography>
-        </Card>
-      ) : (
-        <div>
-          {bookings.map((b, index) => (
-            <Card
-              key={b._id}
-              className={`booking-card status-${b.status.replace(/\s/g, "")}`}
-              sx={{ animationDelay: `${index * 0.05}s` }}
-            >
-              <CardContent>
-                <div className="booking-card-header">
-                  <Typography variant="h6" sx={{ color: "var(--text-dark)" }}>
-                    {b.service}
+        {/* Bookings List Section */}
+        <Grid item xs={12} md={8}>
+          <Card sx={{ p: 3, borderRadius: 3 }}>
+            <Stack spacing={3}>
+              <Stack direction="row" alignItems="center" spacing={1}>
+                <InfoIcon color="primary" />
+                <Typography variant="h6" fontWeight="bold">
+                  Your Bookings
+                </Typography>
+              </Stack>
+              <Divider />
+
+              {bookings.length === 0 ? (
+                <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'background.default' }}>
+                  <Typography color="text.secondary">
+                    No bookings yet. Book your first service!
                   </Typography>
-                  <Chip
-                    label={b.status}
-                    color={
-                      b.status === "Pending"
-                        ? "warning"
-                        : b.status === "In Progress"
-                          ? "info"
-                          : b.status === "Ready for Delivery"
-                            ? "success"
-                            : "primary" // Use primary for completed
-                    }
-                    sx={{ fontWeight: "bold" }}
-                  />
-                </div>
-                <Typography variant="body2" color="text.secondary">
-                  Date: {b.bookingDate}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Booked on: {b.timestamp}
-                </Typography>
-                <Typography variant="body2" sx={{ mt: 1 }}>
-                  Price: ₹{b.serviceDetails?.price} | Duration: {b.serviceDetails?.duration} hours
-                </Typography>
-                {b.status === "Ready for Delivery" && (
-                  <div className="service-ready-message">
-                    <Typography variant="body2">Your service is ready! Please collect your bike.</Typography>
-                  </div>
-                )}
-                <Button variant="outlined" size="small" sx={{ mt: 2 }} onClick={() => handleViewDetails(b)}>
-                  View Details
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+                </Paper>
+              ) : (
+                <Stack spacing={2}>
+                  {bookings.map((booking) => (
+                    <Paper key={booking._id} sx={{ p: 2, borderRadius: 2 }}>
+                      <Grid container spacing={2} alignItems="center">
+                        <Grid item xs={12} sm={8}>
+                          <Stack spacing={1}>
+                            <Typography variant="subtitle1" fontWeight="bold">
+                              {booking.service}
+                            </Typography>
+                            <Stack direction="row" spacing={2} alignItems="center">
+                              <Chip
+                                icon={getStatusIcon(booking.status)}
+                                label={booking.status}
+                                color={getStatusColor(booking.status)}
+                                size="small"
+                              />
+                              <Typography variant="body2" color="text.secondary">
+                                {booking.bookingDate}
+                              </Typography>
+                            </Stack>
+                          </Stack>
+                        </Grid>
+                        <Grid item xs={12} sm={4} sx={{ textAlign: { xs: 'left', sm: 'right' } }}>
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={() => handleViewDetails(booking)}
+                          >
+                            View Details
+                          </Button>
+                        </Grid>
+                      </Grid>
+                    </Paper>
+                  ))}
+                </Stack>
+              )}
+            </Stack>
+          </Card>
+        </Grid>
+      </Grid>
 
-      {/* New Contact Support Section */}
-      <div className="contact-support-section">
-        <Typography variant="h5" gutterBottom>
-          Need Assistance?
-        </Typography>
-        <Typography variant="body1">
-          If you have any questions or need support with your bookings, feel free to reach out to us.
-        </Typography>
-        <Typography variant="body1">
-          Email: <a href="mailto:support@cartrabbitbikeservice.com">support@cartrabbitbikeservice.com</a>
-        </Typography>
-        <Typography variant="body1">Phone: +1 (555) 123-4567</Typography>
-      </div>
-
-      {/* Booking Confirmation Dialog */}
-      <Dialog open={openBookingDialog} onClose={handleCloseBookingDialog}>
-        <DialogTitle>Confirm Booking Details</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            name="name"
-            label="Full Name"
-            type="text"
-            fullWidth
-            variant="outlined"
-            value={bookingFormDetails.name}
-            onChange={handleBookingFormInputChange}
-            required
-          />
-          <TextField
-            margin="dense"
-            name="phone"
-            label="Phone Number"
-            type="tel"
-            fullWidth
-            variant="outlined"
-            value={bookingFormDetails.phone}
-            onChange={handleBookingFormInputChange}
-            required
-          />
-          <TextField
-            margin="dense"
-            name="address"
-            label="Address"
-            type="text"
-            fullWidth
-            variant="outlined"
-            multiline
-            rows={3}
-            value={bookingFormDetails.address}
-            onChange={handleBookingFormInputChange}
-            required
-          />
-          <Typography variant="subtitle1" sx={{ mt: 2 }}>
-            Service: {selectedService}
+      {/* Support Section */}
+      <Card sx={{ mt: 4, p: 3, borderRadius: 3 }}>
+        <Stack spacing={2}>
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <SupportIcon color="primary" />
+            <Typography variant="h6" fontWeight="bold">
+              Need Help?
+            </Typography>
+          </Stack>
+          <Divider />
+          <Typography>
+            Our support team is here to help with any questions about your bookings.
           </Typography>
-          <Typography variant="subtitle1">Date: {new Date(bookingDate).toLocaleDateString()}</Typography>
+          <Stack spacing={1}>
+            <Typography>
+              <strong>Email:</strong> support@cartrabbitbikeservice.com
+            </Typography>
+            <Typography>
+              <strong>Phone:</strong> +1 (555) 123-4567
+            </Typography>
+          </Stack>
+        </Stack>
+      </Card>
+
+      {/* Booking Dialog */}
+      <Dialog open={openBookingDialog} onClose={handleCloseBookingDialog} fullWidth maxWidth="sm">
+        <DialogTitle>
+          <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <Typography variant="h6">Confirm Booking</Typography>
+            <IconButton onClick={handleCloseBookingDialog}>
+              <CloseIcon />
+            </IconButton>
+          </Stack>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Stack spacing={3} sx={{ pt: 1 }}>
+            <Stack spacing={1}>
+              <Typography variant="subtitle2" color="text.secondary">
+                SERVICE DETAILS
+              </Typography>
+              <Paper variant="outlined" sx={{ p: 2 }}>
+                <Stack direction="row" justifyContent="space-between">
+                  <Typography>{selectedService}</Typography>
+                  <Typography fontWeight="bold">
+                    ${services.find(s => s.name === selectedService)?.price || '0'}
+                  </Typography>
+                </Stack>
+                <Typography variant="body2" color="text.secondary">
+                  Scheduled for {new Date(bookingDate).toLocaleDateString()}
+                </Typography>
+              </Paper>
+            </Stack>
+
+            <Stack spacing={2}>
+              <Typography variant="subtitle2" color="text.secondary">
+                YOUR INFORMATION
+              </Typography>
+              <TextField
+                fullWidth
+                label="Full Name"
+                name="name"
+                value={bookingFormDetails.name}
+                onChange={handleBookingFormInputChange}
+                InputProps={{
+                  startAdornment: <PersonIcon color="action" sx={{ mr: 1 }} />
+                }}
+              />
+              <TextField
+                fullWidth
+                label="Phone Number"
+                name="phone"
+                value={bookingFormDetails.phone}
+                onChange={handleBookingFormInputChange}
+                InputProps={{
+                  startAdornment: <PhoneIcon color="action" sx={{ mr: 1 }} />
+                }}
+              />
+              <TextField
+                fullWidth
+                label="Address"
+                name="address"
+                multiline
+                rows={3}
+                value={bookingFormDetails.address}
+                onChange={handleBookingFormInputChange}
+                InputProps={{
+                  startAdornment: <HomeIcon color="action" sx={{ mr: 1, mt: -2, alignSelf: 'flex-start' }} />
+                }}
+              />
+            </Stack>
+          </Stack>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ p: 2 }}>
           <Button onClick={handleCloseBookingDialog}>Cancel</Button>
-          <Button onClick={handleBook} variant="contained" color="primary">
+          <Button variant="contained" onClick={handleBook}>
             Confirm Booking
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Booking Details Dialog (New) */}
-      <Dialog open={openDetailsDialog} onClose={handleCloseDetailsDialog} maxWidth="sm" fullWidth>
+      {/* Details Dialog */}
+      <Dialog open={openDetailsDialog} onClose={handleCloseDetailsDialog} fullWidth maxWidth="sm">
         {selectedBookingDetails && (
           <>
-            <DialogTitle>Booking Details</DialogTitle>
+            <DialogTitle>
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Typography variant="h6">Booking Details</Typography>
+                <IconButton onClick={handleCloseDetailsDialog}>
+                  <CloseIcon />
+                </IconButton>
+              </Stack>
+            </DialogTitle>
             <DialogContent dividers>
-              <Typography variant="h6" gutterBottom>
-                {selectedBookingDetails.service}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Customer:</strong> {selectedBookingDetails.name} ({selectedBookingDetails.email})
-              </Typography>
-              <Typography variant="body1">
-                <strong>Phone:</strong> {selectedBookingDetails.phone}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Address:</strong> {selectedBookingDetails.address}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Service Date:</strong> {selectedBookingDetails.bookingDate || selectedBookingDetails.date}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Booked On:</strong> {selectedBookingDetails.timestamp}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Status:</strong>{" "}
-                <Chip
-                  label={selectedBookingDetails.status}
-                  color={
-                    selectedBookingDetails.status === "Pending"
-                      ? "warning"
-                      : selectedBookingDetails.status === "In Progress"
-                        ? "info"
-                        : selectedBookingDetails.status === "Ready for Delivery"
-                          ? "success"
-                          : "primary"
-                  }
-                  size="small"
-                />
-              </Typography>
-              {selectedBookingDetails.serviceDetails && (
-                <div style={{ marginTop: "1rem", borderTop: "1px solid #eee", paddingTop: "1rem" }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
-                    Service Plan Details:
-                  </Typography>
-                  <Typography variant="body2">Price: ₹{selectedBookingDetails.serviceDetails.price}</Typography>
-                  <Typography variant="body2">
-                    Duration: {selectedBookingDetails.serviceDetails.duration} hours
-                  </Typography>
-                  {selectedBookingDetails.serviceDetails.description && (
-                    <Typography variant="body2">
-                      Description: {selectedBookingDetails.serviceDetails.description}
+              <Stack spacing={3}>
+                {/* Service Summary */}
+                <Paper variant="outlined" sx={{ p: 2 }}>
+                  <Stack direction="row" justifyContent="space-between" alignItems="center">
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      {selectedBookingDetails.service}
                     </Typography>
-                  )}
-                </div>
-              )}
+                    <Chip
+                      icon={getStatusIcon(selectedBookingDetails.status)}
+                      label={selectedBookingDetails.status}
+                      color={getStatusColor(selectedBookingDetails.status)}
+                    />
+                  </Stack>
+                  <Stack direction="row" justifyContent="space-between" mt={1}>
+                    <Typography variant="body2" color="text.secondary">
+                      {selectedBookingDetails.bookingDate}
+                    </Typography>
+                    <Typography variant="body2" fontWeight="bold">
+                      ${selectedBookingDetails.serviceDetails?.price || '0'}
+                    </Typography>
+                  </Stack>
+                </Paper>
+
+                {/* Customer Info */}
+                <Stack spacing={1}>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    CUSTOMER INFORMATION
+                  </Typography>
+                  <Stack spacing={1}>
+                    <Typography>
+                      <strong>Name:</strong> {selectedBookingDetails.name}
+                    </Typography>
+                    <Typography>
+                      <strong>Email:</strong> {selectedBookingDetails.email}
+                    </Typography>
+                    <Typography>
+                      <strong>Phone:</strong> {selectedBookingDetails.phone}
+                    </Typography>
+                    <Typography>
+                      <strong>Address:</strong> {selectedBookingDetails.address}
+                    </Typography>
+                  </Stack>
+                </Stack>
+
+                {/* Service Details */}
+                {selectedBookingDetails.serviceDetails && (
+                  <Stack spacing={1}>
+                    <Typography variant="subtitle2" color="text.secondary">
+                      SERVICE DETAILS
+                    </Typography>
+                    <Stack spacing={1}>
+                      <Typography>
+                        <strong>Duration:</strong> {selectedBookingDetails.serviceDetails.duration} hours
+                      </Typography>
+                      {selectedBookingDetails.serviceDetails.description && (
+                        <Typography>
+                          <strong>Description:</strong> {selectedBookingDetails.serviceDetails.description}
+                        </Typography>
+                      )}
+                    </Stack>
+                  </Stack>
+                )}
+              </Stack>
             </DialogContent>
-            <DialogActions>
+            <DialogActions sx={{ p: 2 }}>
               <Button onClick={handleCloseDetailsDialog} variant="contained">
                 Close
               </Button>
@@ -366,7 +470,7 @@ function CustomerDashboard() {
           </>
         )}
       </Dialog>
-    </div>
+    </Box>
   )
 }
 

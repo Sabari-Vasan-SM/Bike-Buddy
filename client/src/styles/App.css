@@ -1,6 +1,6 @@
 /* src/styles/App.css */
 :root {
-  --primary-color: #4a90e2;
+  --primary-color: #27ae60; /* Changed from blue (#4a90e2) to green */
   --secondary-color: #6c757d;
   --background-light: #f8f9fa;
   --background-card: #ffffff;
@@ -73,7 +73,7 @@ button[variant="contained"] {
 }
 
 button[variant="contained"]:hover {
-  background-color: #357abd;
+  background-color: #219150; /* A darker green for hover */
 }
 
 /* Outlined button */
@@ -84,7 +84,7 @@ button[variant="outlined"] {
 }
 
 button[variant="outlined"]:hover {
-  background-color: rgba(74, 144, 226, 0.05);
+  background-color: rgba(39, 174, 96, 0.05); /* Green with opacity */
 }
 
 /* Error button */
@@ -116,7 +116,7 @@ input:focus,
 select:focus,
 textarea:focus {
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+  box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.2); /* Green shadow */
   outline: none;
 }
 

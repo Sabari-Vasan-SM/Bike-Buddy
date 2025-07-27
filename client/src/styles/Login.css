@@ -1,7 +1,8 @@
 .login-container {
-  width: 380px;
-  margin: 80px auto;
-  padding: 35px;
+  width: 100%;
+  max-width: 340px;
+  margin: 40px auto;
+  padding: 24px 18px;
   background-color: var(--background-card);
   border-radius: 16px;
   box-shadow: 0 8px 25px var(--shadow-medium);
@@ -10,37 +11,38 @@
   animation: slideUp 0.8s ease-out forwards;
   opacity: 0;
   border: 1px solid var(--border-color);
+  min-height: unset;
 }
 
 .login-image {
-  width: 120px;
-  height: 120px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   object-fit: cover;
-  border: 4px solid var(--primary-color);
-  box-shadow: 0 0 15px rgba(74, 144, 226, 0.3);
+  border: 3px solid var(--primary-color);
+  box-shadow: 0 0 10px rgba(39, 174, 96, 0.2);
 }
 
 h2 {
   color: var(--primary-color);
-  margin-bottom: 25px;
-  font-size: 2rem;
+  margin-bottom: 18px;
+  font-size: 1.5rem;
   font-weight: 600;
 }
 
 form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 14px;
 }
 
 input,
 .pill-select {
-  padding: 12px 18px;
-  border-radius: 10px;
+  padding: 10px 14px;
+  border-radius: 8px;
   border: 1px solid var(--border-color);
-  font-size: 1.05rem;
+  font-size: 1rem;
   outline: none;
   transition: all 0.3s ease;
   background-color: var(--background-light);
@@ -60,16 +62,11 @@ input,
 }
 
 button {
-  padding: 12px;
-  border-radius: 10px;
-  background-color: var(--primary-color);
-  color: white;
-  font-size: 1.1rem;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 1rem;
   font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+  box-shadow: 0 2px 8px rgba(39, 174, 96, 0.15);
 }
 
 button:hover {
@@ -79,7 +76,8 @@ button:hover {
 }
 
 p {
-  margin-top: 25px;
+  margin-top: 18px;
+  font-size: 0.95rem;
   color: var(--text-muted);
 }
 
@@ -93,4 +91,21 @@ a {
 a:hover {
   text-decoration: underline;
   color: #357abd;
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    max-width: 98vw;
+    margin: 18px auto;
+    padding: 12px 6px;
+  }
+  .login-image {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 10px;
+  }
+  h2 {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+  }
 }

@@ -7,7 +7,7 @@ import Navbar from "./components/Navbar"
 import "./styles/Login.css"
 import "./styles/CustomerDashboard.css"
 import "./styles/Navbar.css"
-import "./styles/OwnerDashboard.css"
+import "./styles/OwnerDashboard.css"; // Importing OwnerDashboard specific styles
 import "./styles/App.css" // Ensure App.css is imported for global styles
 
 // Protected Route Component
