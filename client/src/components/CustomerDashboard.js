@@ -61,8 +61,8 @@ function CustomerDashboard() {
       const loadData = async () => {
         try {
           const [bookingsRes, servicesRes] = await Promise.all([
-            fetch(`http://localhost:5000/api/bookings?email=${user.email}`),
-            fetch("http://localhost:5000/api/services"),
+            fetch(`https://cartrabbit-6qz5.onrender.com/api/bookings?email=${user.email}`),
+            fetch("https://cartrabbit-6qz5.onrender.com/api/services"),
           ])
           setBookings(await bookingsRes.json())
           setServices(await servicesRes.json())
@@ -105,7 +105,7 @@ function CustomerDashboard() {
       bookingDate: new Date(bookingDate).toLocaleDateString(),
     }
     try {
-      const res = await fetch("http://localhost:5000/api/bookings", {
+      const res = await fetch("https://cartrabbit-6qz5.onrender.com/api/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(booking),

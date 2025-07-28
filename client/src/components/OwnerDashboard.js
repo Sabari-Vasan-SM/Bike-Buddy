@@ -42,8 +42,8 @@ function OwnerDashboard() {
       const loadData = async () => {
         try {
           const [bookingsRes, servicesRes] = await Promise.all([
-            fetch("http://localhost:5000/api/bookings"),
-            fetch("http://localhost:5000/api/services"),
+            fetch("https://cartrabbit-6qz5.onrender.com/api/bookings"),
+            fetch("https://cartrabbit-6qz5.onrender.com/api/services"),
           ])
           const bookingsData = await bookingsRes.json()
           const servicesData = await servicesRes.json()
@@ -61,7 +61,7 @@ function OwnerDashboard() {
 
   const handleStatusChange = async (id, newStatus, customerEmail, serviceName, bookingDate, customerMobile) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/bookings/${id}/status`, {
+      const res = await fetch(`https://cartrabbit-6qz5.onrender.com/api/bookings/${id}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
@@ -87,7 +87,7 @@ function OwnerDashboard() {
       return
     }
     try {
-      const res = await fetch("http://localhost:5000/api/services", {
+      const res = await fetch("https://cartrabbit-6qz5.onrender.com/api/services", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newService),
@@ -107,7 +107,7 @@ function OwnerDashboard() {
 
   const handleUpdateService = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/services/${editingService._id}`, {
+      const res = await fetch(`https://cartrabbit-6qz5.onrender.com/api/services/${editingService._id}`, {
         // Use _id
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -128,7 +128,7 @@ function OwnerDashboard() {
   const handleDeleteService = async (id) => {
     if (window.confirm("Are you sure you want to delete this service?")) {
       try {
-        const res = await fetch(`http://localhost:5000/api/services/${id}`, {
+        const res = await fetch(`https://cartrabbit-6qz5.onrender.com/api/services/${id}`, {
           method: "DELETE",
         })
         if (res.ok) {
@@ -145,7 +145,7 @@ function OwnerDashboard() {
   const handleDeleteBooking = async (id) => {
     if (window.confirm("Are you sure you want to delete this booking? This action cannot be undone.")) {
       try {
-        const res = await fetch(`http://localhost:5000/api/bookings/${id}`, {
+        const res = await fetch(`https://cartrabbit-6qz5.onrender.com/api/bookings/${id}`, {
           method: "DELETE",
         })
         if (res.ok) {
