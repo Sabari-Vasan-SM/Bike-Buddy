@@ -9,23 +9,13 @@ import {
   DialogActions,
   TextField,
   Button,
-  Card,
   Typography,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
   Chip,
-  Divider,
-  Box,
-  Grid,
-  Avatar,
   Paper,
   Stack,
-  IconButton
+  IconButton,
 } from "@mui/material"
 import {
-  DirectionsBike as BikeIcon,
   CalendarToday as CalendarIcon,
   SupportAgent as SupportIcon,
   Info as InfoIcon,
@@ -35,7 +25,8 @@ import {
   Home as HomeIcon,
   CheckCircle as CheckCircleIcon,
   Schedule as ScheduleIcon,
-  Receipt as ReceiptIcon
+  Receipt as ReceiptIcon,
+  Email as EmailIcon,
 } from "@mui/icons-material"
 
 function CustomerDashboard() {
@@ -53,6 +44,18 @@ function CustomerDashboard() {
     address: "",
   })
   const [services, setServices] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  const showNotification = (message, type = "success") => {
+    const notification = document.createElement("div")
+    notification.className = `notification ${type}`
+    notification.textContent = message
+    document.body.appendChild(notification)
+
+    setTimeout(() => {
+      notification.remove()
+    }, 4000)
+  }
 
   useEffect(() => {
     if (!user || user.role !== "customer") {
@@ -69,6 +72,9 @@ function CustomerDashboard() {
         } catch (err) {
           setBookings([])
           setServices([])
+          showNotification("Failed to load data. Please refresh the page.", "error")
+        } finally {
+          setIsLoading(false)
         }
       }
       loadData()
@@ -77,7 +83,7 @@ function CustomerDashboard() {
 
   const handleOpenBookingDialog = () => {
     if (!bookingDate || !selectedService) {
-      alert("Please select a service and date")
+      showNotification("Please select a service and date", "warning")
       return
     }
     setOpenBookingDialog(true)
@@ -104,12 +110,14 @@ function CustomerDashboard() {
       timestamp: new Date().toLocaleString(),
       bookingDate: new Date(bookingDate).toLocaleDateString(),
     }
+
     try {
       const res = await fetch("https://cartrabbit-6qz5.onrender.com/api/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(booking),
       })
+
       if (res.ok) {
         const created = await res.json()
         setBookings([...bookings, created])
@@ -117,12 +125,12 @@ function CustomerDashboard() {
         setBookingDate("")
         setBookingFormDetails({ name: "", phone: "", address: "" })
         setOpenBookingDialog(false)
-        alert(`Booking confirmed for ${selectedService} on ${booking.bookingDate}`)
+        showNotification(`Booking confirmed for ${selectedService} on ${booking.bookingDate}`, "success")
       } else {
-        alert("Failed to book service")
+        showNotification("Failed to book service. Please try again.", "error")
       }
     } catch (err) {
-      alert("Server error. Please try again later.")
+      showNotification("Server error. Please try again later.", "error")
     }
   }
 
@@ -138,176 +146,174 @@ function CustomerDashboard() {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "Pending": return "warning"
-      case "In Progress": return "info"
-      case "Ready for Delivery": return "success"
-      default: return "primary"
+      case "Pending":
+        return "warning"
+      case "In Progress":
+        return "info"
+      case "Ready for Delivery":
+        return "success"
+      default:
+        return "primary"
     }
   }
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case "Ready for Delivery": return <CheckCircleIcon />
-      case "In Progress": return <ScheduleIcon />
-      default: return <ReceiptIcon />
+      case "Ready for Delivery":
+        return <CheckCircleIcon />
+      case "In Progress":
+        return <ScheduleIcon />
+      default:
+        return <ReceiptIcon />
     }
   }
 
+  // Calculate stats
+  const totalBookings = bookings.length
+  const pendingBookings = bookings.filter((b) => b.status === "Pending").length
+  const completedBookings = bookings.filter((b) => b.status === "Completed").length
+
+  if (isLoading) {
+    return (
+      <div className="dashboard-container">
+        <div style={{ textAlign: "center", padding: "60px 20px" }}>
+          <div className="loading"></div>
+          <p style={{ marginTop: "16px", color: "var(--text-secondary)" }}>Loading your dashboard...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <Box sx={{ maxWidth: 1200, mx: 'auto', p: { xs: 2, md: 4 } }}>
+    <div className="dashboard-container">
       {/* Welcome Section */}
-      <Card sx={{ mb: 4, p: 3, borderRadius: 3, bgcolor: 'primary.light' }}>
-        <Stack direction="row" alignItems="center" spacing={2}>
-          <Avatar sx={{ bgcolor: 'primary.main', width: 56, height: 56 }}>
-            <BikeIcon fontSize="large" />
-          </Avatar>
-          <Box>
-            <Typography variant="h5" fontWeight="bold">
-              Welcome back, {user?.email.split('@')[0]}!
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              Book and manage your bike services with ease
-            </Typography>
-          </Box>
-        </Stack>
-      </Card>
+      <div className="welcome-section">
+        <div className="welcome-content">
+          <h1 className="welcome-title">Welcome back, {user?.email.split("@")[0]}! 👋</h1>
+          <p className="welcome-subtitle">Book and manage your bike services with ease</p>
+        </div>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="stats-grid">
+        <div className="stat-card">
+          <span className="stat-number">{totalBookings}</span>
+          <span className="stat-label">Total Bookings</span>
+        </div>
+        <div className="stat-card">
+          <span className="stat-number">{pendingBookings}</span>
+          <span className="stat-label">Pending</span>
+        </div>
+        <div className="stat-card">
+          <span className="stat-number">{completedBookings}</span>
+          <span className="stat-label">Completed</span>
+        </div>
+      </div>
 
       {/* Main Content Grid */}
-      <Grid container spacing={3}>
+      <div className="main-grid">
         {/* Book Service Section */}
-        <Grid item xs={12} md={4}>
-          <Card sx={{ p: 3, height: '100%', borderRadius: 3 }}>
-            <Stack spacing={3}>
-              <Stack direction="row" alignItems="center" spacing={1}>
-                <CalendarIcon color="primary" />
-                <Typography variant="h6" fontWeight="bold">
-                  Book a Service
-                </Typography>
-              </Stack>
-              <Divider />
-              
-              <FormControl fullWidth>
-                <InputLabel>Select Service</InputLabel>
-                <Select
-                  value={selectedService}
-                  onChange={(e) => setSelectedService(e.target.value)}
-                  label="Select Service"
-                >
-                  <MenuItem value="">Select a service</MenuItem>
-                  {services.map((service) => (
-                    <MenuItem key={service._id} value={service.name}>
-                      {service.name} (${service.price}, {service.duration} hrs)
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              
-              <TextField
-                type="date"
-                value={bookingDate}
-                onChange={(e) => setBookingDate(e.target.value)}
-                InputLabelProps={{ shrink: true }}
-                label="Service Date"
-                inputProps={{ min: new Date().toISOString().split("T")[0] }}
-                fullWidth
-              />
-              
-              <Button
-                variant="contained"
-                size="large"
-                onClick={handleOpenBookingDialog}
-                disabled={!selectedService || !bookingDate}
-                sx={{ py: 1.5 }}
-              >
-                Continue Booking
-              </Button>
-            </Stack>
-          </Card>
-        </Grid>
+        <div className="booking-form-card">
+          <h2 className="form-title">
+            <CalendarIcon /> Book a Service
+          </h2>
+
+          <div className="form-group">
+            <label className="form-label">Select Service</label>
+            <select
+              value={selectedService}
+              onChange={(e) => setSelectedService(e.target.value)}
+              className="form-select"
+            >
+              <option value="">Choose a service</option>
+              {services.map((service) => (
+                <option key={service._id} value={service.name}>
+                  {service.name} (${service.price}, {service.duration} hrs)
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Service Date</label>
+            <input
+              type="date"
+              value={bookingDate}
+              onChange={(e) => setBookingDate(e.target.value)}
+              min={new Date().toISOString().split("T")[0]}
+              className="form-input"
+            />
+          </div>
+
+          <button className="book-button" onClick={handleOpenBookingDialog} disabled={!selectedService || !bookingDate}>
+            Continue Booking
+          </button>
+        </div>
 
         {/* Bookings List Section */}
-        <Grid item xs={12} md={8}>
-          <Card sx={{ p: 3, borderRadius: 3 }}>
-            <Stack spacing={3}>
-              <Stack direction="row" alignItems="center" spacing={1}>
-                <InfoIcon color="primary" />
-                <Typography variant="h6" fontWeight="bold">
-                  Your Bookings
-                </Typography>
-              </Stack>
-              <Divider />
+        <div className="bookings-card">
+          <h2 className="bookings-title">
+            <InfoIcon /> Your Bookings
+          </h2>
 
-              {bookings.length === 0 ? (
-                <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'background.default' }}>
-                  <Typography color="text.secondary">
-                    No bookings yet. Book your first service!
-                  </Typography>
-                </Paper>
-              ) : (
-                <Stack spacing={2}>
-                  {bookings.map((booking) => (
-                    <Paper key={booking._id} sx={{ p: 2, borderRadius: 2 }}>
-                      <Grid container spacing={2} alignItems="center">
-                        <Grid item xs={12} sm={8}>
-                          <Stack spacing={1}>
-                            <Typography variant="subtitle1" fontWeight="bold">
-                              {booking.service}
-                            </Typography>
-                            <Stack direction="row" spacing={2} alignItems="center">
-                              <Chip
-                                icon={getStatusIcon(booking.status)}
-                                label={booking.status}
-                                color={getStatusColor(booking.status)}
-                                size="small"
-                              />
-                              <Typography variant="body2" color="text.secondary">
-                                {booking.bookingDate}
-                              </Typography>
-                            </Stack>
-                          </Stack>
-                        </Grid>
-                        <Grid item xs={12} sm={4} sx={{ textAlign: { xs: 'left', sm: 'right' } }}>
-                          <Button
-                            variant="outlined"
-                            size="small"
-                            onClick={() => handleViewDetails(booking)}
-                          >
-                            View Details
-                          </Button>
-                        </Grid>
-                      </Grid>
-                    </Paper>
-                  ))}
-                </Stack>
-              )}
-            </Stack>
-          </Card>
-        </Grid>
-      </Grid>
+          {bookings.length === 0 ? (
+            <div className="empty-state">
+              <div className="empty-icon">📋</div>
+              <h3 className="empty-title">No bookings yet</h3>
+              <p className="empty-subtitle">Book your first service to get started!</p>
+            </div>
+          ) : (
+            <div className="bookings-list">
+              {bookings.map((booking) => (
+                <div key={booking._id} className="booking-item">
+                  <div className="booking-header">
+                    <h3 className="booking-service">{booking.service}</h3>
+                    <span className={`status-badge status-${booking.status.toLowerCase().replace(/\s/g, "")}`}>
+                      {booking.status}
+                    </span>
+                  </div>
+                  <div className="booking-details">
+                    <span>📅 {booking.bookingDate}</span>
+                    <span>💰 ${booking.serviceDetails?.price || "0"}</span>
+                    <span>⏱️ {booking.serviceDetails?.duration || "0"} hrs</span>
+                  </div>
+                  <div className="booking-actions">
+                    <button className="view-details-btn" onClick={() => handleViewDetails(booking)}>
+                      View Details
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Support Section */}
-      <Card sx={{ mt: 4, p: 3, borderRadius: 3 }}>
-        <Stack spacing={2}>
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <SupportIcon color="primary" />
-            <Typography variant="h6" fontWeight="bold">
-              Need Help?
-            </Typography>
-          </Stack>
-          <Divider />
-          <Typography>
-            Our support team is here to help with any questions about your bookings.
-          </Typography>
-          <Stack spacing={1}>
-            <Typography>
-              <strong>Email:</strong> support@cartrabbitbikeservice.com
-            </Typography>
-            <Typography>
-              <strong>Phone:</strong> +1 (555) 123-4567
-            </Typography>
-          </Stack>
-        </Stack>
-      </Card>
+      <div className="support-section">
+        <h2 className="support-title">
+          <SupportIcon /> Need Help?
+        </h2>
+        <p className="support-content">Our support team is here to help with any questions about your bookings.</p>
+        <div className="support-contacts">
+          <div className="contact-item">
+            <EmailIcon />
+            <div>
+              <strong>Email:</strong>
+              <br />
+              support@cartrabbitbikeservice.com
+            </div>
+          </div>
+          <div className="contact-item">
+            <PhoneIcon />
+            <div>
+              <strong>Phone:</strong>
+              <br />
+              +1 (555) 123-4567
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Booking Dialog */}
       <Dialog open={openBookingDialog} onClose={handleCloseBookingDialog} fullWidth maxWidth="sm">
@@ -329,7 +335,7 @@ function CustomerDashboard() {
                 <Stack direction="row" justifyContent="space-between">
                   <Typography>{selectedService}</Typography>
                   <Typography fontWeight="bold">
-                    ${services.find(s => s.name === selectedService)?.price || '0'}
+                    ${services.find((s) => s.name === selectedService)?.price || "0"}
                   </Typography>
                 </Stack>
                 <Typography variant="body2" color="text.secondary">
@@ -349,7 +355,7 @@ function CustomerDashboard() {
                 value={bookingFormDetails.name}
                 onChange={handleBookingFormInputChange}
                 InputProps={{
-                  startAdornment: <PersonIcon color="action" sx={{ mr: 1 }} />
+                  startAdornment: <PersonIcon color="action" sx={{ mr: 1 }} />,
                 }}
               />
               <TextField
@@ -359,7 +365,7 @@ function CustomerDashboard() {
                 value={bookingFormDetails.phone}
                 onChange={handleBookingFormInputChange}
                 InputProps={{
-                  startAdornment: <PhoneIcon color="action" sx={{ mr: 1 }} />
+                  startAdornment: <PhoneIcon color="action" sx={{ mr: 1 }} />,
                 }}
               />
               <TextField
@@ -371,7 +377,7 @@ function CustomerDashboard() {
                 value={bookingFormDetails.address}
                 onChange={handleBookingFormInputChange}
                 InputProps={{
-                  startAdornment: <HomeIcon color="action" sx={{ mr: 1, mt: -2, alignSelf: 'flex-start' }} />
+                  startAdornment: <HomeIcon color="action" sx={{ mr: 1, mt: -2, alignSelf: "flex-start" }} />,
                 }}
               />
             </Stack>
@@ -416,7 +422,7 @@ function CustomerDashboard() {
                       {selectedBookingDetails.bookingDate}
                     </Typography>
                     <Typography variant="body2" fontWeight="bold">
-                      ${selectedBookingDetails.serviceDetails?.price || '0'}
+                      ${selectedBookingDetails.serviceDetails?.price || "0"}
                     </Typography>
                   </Stack>
                 </Paper>
@@ -470,7 +476,7 @@ function CustomerDashboard() {
           </>
         )}
       </Dialog>
-    </Box>
+    </div>
   )
 }
 
