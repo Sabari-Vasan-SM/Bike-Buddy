@@ -49,8 +49,8 @@ function OwnerDashboard() {
       const loadData = async () => {
         try {
           const [bookingsRes, servicesRes] = await Promise.all([
-            fetch("https://cartrabbit-1-p9a2.onrender.com/api/bookings"),
-            fetch("https://cartrabbit-1-p9a2.onrender.com/api/services"),
+            fetch("https://cartrabbit-6qz5.onrender.com/api/bookings"),
+            fetch("https://cartrabbit-6qz5.onrender.com/api/services"),
           ])
           const bookingsData = await bookingsRes.json()
           const servicesData = await servicesRes.json()
@@ -71,7 +71,7 @@ function OwnerDashboard() {
 
   const handleStatusChange = async (id, newStatus, customerEmail, serviceName, bookingDate, customerMobile) => {
     try {
-      const res = await fetch(`https://cartrabbit-1-p9a2.onrender.com/api/bookings/${id}/status`, {
+      const res = await fetch(`https://cartrabbit-6qz5.onrender.com/api/bookings/${id}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
