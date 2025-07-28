@@ -64,8 +64,8 @@ function CustomerDashboard() {
       const loadData = async () => {
         try {
           const [bookingsRes, servicesRes] = await Promise.all([
-            fetch(`https://cartrabbit-1-p9a2.onrender.com/api/bookings?email=${user.email}`),
-            fetch("https://cartrabbit-1-p9a2.onrender.com/api/services"),
+            fetch(`https://cartrabbit-6qz5.onrender.com/api/bookings?email=${user.email}`),
+            fetch("https://cartrabbit-6qz5.onrender.com/api/services"),
           ])
           setBookings(await bookingsRes.json())
           setServices(await servicesRes.json())
@@ -112,7 +112,7 @@ function CustomerDashboard() {
     }
 
     try {
-      const res = await fetch("https://cartrabbit-1-p9a2.onrender.com/api/bookings", {
+      const res = await fetch("https://cartrabbit-6qz5.onrender.com/api/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(booking),
@@ -228,7 +228,7 @@ function CustomerDashboard() {
               <option value="">Choose a service</option>
               {services.map((service) => (
                 <option key={service._id} value={service.name}>
-                  {service.name} ( ₹ {service.price}, {service.duration} hrs)
+                  {service.name} (${service.price}, {service.duration} hrs)
                 </option>
               ))}
             </select>
@@ -274,7 +274,7 @@ function CustomerDashboard() {
                   </div>
                   <div className="booking-details">
                     <span>📅 {booking.bookingDate}</span>
-                    <span>💰  ₹ {booking.serviceDetails?.price || "0"}</span>
+                    <span>💰 ${booking.serviceDetails?.price || "0"}</span>
                     <span>⏱️ {booking.serviceDetails?.duration || "0"} hrs</span>
                   </div>
                   <div className="booking-actions">
@@ -422,7 +422,7 @@ function CustomerDashboard() {
                       {selectedBookingDetails.bookingDate}
                     </Typography>
                     <Typography variant="body2" fontWeight="bold">
-                       ₹ {selectedBookingDetails.serviceDetails?.price || "0"}
+                      ${selectedBookingDetails.serviceDetails?.price || "0"}
                     </Typography>
                   </Stack>
                 </Paper>

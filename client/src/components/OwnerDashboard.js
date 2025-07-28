@@ -48,8 +48,8 @@ function OwnerDashboard() {
       const loadData = async () => {
         try {
           const [bookingsRes, servicesRes] = await Promise.all([
-            fetch("https://cartrabbit-1-p9a2.onrender.com/api/bookings"),
-            fetch("https://cartrabbit-1-p9a2.onrender.com/api/services"),
+            fetch("https://cartrabbit-6qz5.onrender.com/api/bookings"),
+            fetch("https://cartrabbit-6qz5.onrender.com/api/services"),
           ])
           const bookingsData = await bookingsRes.json()
           const servicesData = await servicesRes.json()
@@ -70,7 +70,7 @@ function OwnerDashboard() {
 
   const handleStatusChange = async (id, newStatus, customerEmail, serviceName, bookingDate, customerMobile) => {
     try {
-      const res = await fetch(`https://cartrabbit-1-p9a2.onrender.com/api/bookings/${id}/status`, {
+      const res = await fetch(`https://cartrabbit-6qz5.onrender.com/api/bookings/${id}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
@@ -92,7 +92,7 @@ function OwnerDashboard() {
       return
     }
     try {
-      const res = await fetch("https://cartrabbit-1-p9a2.onrender.com/api/services", {
+      const res = await fetch("https://cartrabbit-6qz5.onrender.com/api/services", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newService),
@@ -113,7 +113,7 @@ function OwnerDashboard() {
 
   const handleUpdateService = async () => {
     try {
-      const res = await fetch(`https://cartrabbit-1-p9a2.onrender.com/api/services/${editingService._id}`, {
+      const res = await fetch(`https://cartrabbit-6qz5.onrender.com/api/services/${editingService._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(editingService),
@@ -134,7 +134,7 @@ function OwnerDashboard() {
   const handleDeleteService = async (id) => {
     if (window.confirm("Are you sure you want to delete this service?")) {
       try {
-        const res = await fetch(`https://cartrabbit-1-p9a2.onrender.com/api/services/${id}`, {
+        const res = await fetch(`https://cartrabbit-6qz5.onrender.com/api/services/${id}`, {
           method: "DELETE",
         })
         if (res.ok) {
@@ -152,7 +152,7 @@ function OwnerDashboard() {
   const handleDeleteBooking = async (id) => {
     if (window.confirm("Are you sure you want to delete this booking? This action cannot be undone.")) {
       try {
-        const res = await fetch(`https://cartrabbit-1-p9a2.onrender.com/api/bookings/${id}`, {
+        const res = await fetch(`https://cartrabbit-6qz5.onrender.com/api/bookings/${id}`, {
           method: "DELETE",
         })
         if (res.ok) {
@@ -279,7 +279,7 @@ function OwnerDashboard() {
                   />
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Price (₹)</label>
+                  <label className="form-label">Price ($)</label>
                   <input
                     className="form-input"
                     type="number"
@@ -359,7 +359,7 @@ function OwnerDashboard() {
                       <div className="service-info">
                         <h3>{service.name}</h3>
                         <p className="service-meta">
-                           ₹ {service.price} • {service.duration} hrs
+                          ${service.price} • {service.duration} hrs
                         </p>
                         {service.description && <p className="service-description">{service.description}</p>}
                       </div>
@@ -431,7 +431,7 @@ function OwnerDashboard() {
                       <div className="booking-meta">
                         <span>📅 Booked: {booking.timestamp}</span>
                         <span>🗓️ Service: {booking.bookingDate || booking.date}</span>
-                        <span>💰  ₹ {booking.serviceDetails?.price || "0"}</span>
+                        <span>💰 ${booking.serviceDetails?.price || "0"}</span>
                       </div>
                       <div className="booking-card-actions">
                         <div className="booking-actions-left">
@@ -520,7 +520,7 @@ function OwnerDashboard() {
                   <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
                     Service Plan Details:
                   </Typography>
-                  <Typography variant="body2">Price:  ₹ {selectedBooking.serviceDetails.price}</Typography>
+                  <Typography variant="body2">Price: ${selectedBooking.serviceDetails.price}</Typography>
                   <Typography variant="body2">Duration: {selectedBooking.serviceDetails.duration} hours</Typography>
                   {selectedBooking.serviceDetails.description && (
                     <Typography variant="body2">Description: {selectedBooking.serviceDetails.description}</Typography>
