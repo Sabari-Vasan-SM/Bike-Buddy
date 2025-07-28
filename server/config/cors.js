@@ -4,7 +4,8 @@ const allowedOrigins = [
   "http://localhost:3000", // React default dev server
   "http://localhost:3001", // If you use this port
   "https://cartrabbit-1-p9a2.onrender.com/api/auth/register",
-  "127.0.0.1:3000"
+  "127.0.0.1:3000",
+  "https://cartrabbit-nine.vercel.app" // Deployed frontend
   // add any other allowed origins here
 ];
 
