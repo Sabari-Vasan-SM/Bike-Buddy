@@ -29,7 +29,8 @@ function Login() {
         alert(data.message || "Invalid Credentials")
       }
     } catch (err) {
-      alert("Server error. Please try again later.")
+      console.error("Login error:", err)
+      alert("Network or server error. Please check your connection or try again later.")
     }
   }
 
