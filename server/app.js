@@ -17,7 +17,8 @@ app.get("/", (req, res) => {
 })
 
 // Routes
-app.use("/api/auth", require("./routes/auth"))
+// Mount routes
+app.use("/api/auth", require("./routes/auth")) // Ensure auth routes are mounted correctly
 app.use("/api/services", require("./routes/services"))
 app.use("/api/bookings", require("./routes/bookings")) // Added bookings route
 

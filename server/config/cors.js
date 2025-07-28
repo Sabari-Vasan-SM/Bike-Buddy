@@ -1,8 +1,11 @@
 const cors = require("cors")
 
 const allowedOrigins = [
-  "http://localhost:3000",
-  "https://cartrabbit-nine.vercel.app",
+  "http://localhost:3000", // React default dev server
+  "http://localhost:3001", // If you use this port
+  "https://cartrabbit-1-p9a2.onrender.com",
+  "127.0.0.1:3000"
+  // add any other allowed origins here
 ];
 
 module.exports = cors({
