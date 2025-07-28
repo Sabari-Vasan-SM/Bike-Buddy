@@ -93,7 +93,7 @@ function OwnerDashboard() {
       return
     }
     try {
-      const res = await fetch("https://cartrabbit-1-p9a2.onrender.com/api/services", {
+      const res = await fetch("https://cartrabbit-6qz5.onrender.com/api/services", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newService),
@@ -114,7 +114,7 @@ function OwnerDashboard() {
 
   const handleUpdateService = async () => {
     try {
-      const res = await fetch(`https://cartrabbit-1-p9a2.onrender.com/api/services/${editingService._id}`, {
+      const res = await fetch(`https://cartrabbit-6qz5.onrender.com/api/services/${editingService._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(editingService),
@@ -135,7 +135,7 @@ function OwnerDashboard() {
   const handleDeleteService = async (id) => {
     if (window.confirm("Are you sure you want to delete this service?")) {
       try {
-        const res = await fetch(`https://cartrabbit-1-p9a2.onrender.com/api/services/${id}`, {
+        const res = await fetch(`https://cartrabbit-6qz5.onrender.com/api/services/${id}`, {
           method: "DELETE",
         })
         if (res.ok) {
@@ -153,7 +153,7 @@ function OwnerDashboard() {
   const handleDeleteBooking = async (id) => {
     if (window.confirm("Are you sure you want to delete this booking? This action cannot be undone.")) {
       try {
-        const res = await fetch(`https://cartrabbit-1-p9a2.onrender.com/api/bookings/${id}`, {
+        const res = await fetch(`https://cartrabbit-6qz5.onrender.com/api/bookings/${id}`, {
           method: "DELETE",
         })
         if (res.ok) {
