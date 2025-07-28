@@ -6,7 +6,10 @@ const app = express()
 
 // Middleware
 app.use(express.json())
+
 app.use(corsMiddleware)
+// Handle preflight OPTIONS requests for all routes
+app.options('*', corsMiddleware)
 
 // Connect to MongoDB
 connectDB()
