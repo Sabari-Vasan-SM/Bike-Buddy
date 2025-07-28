@@ -13,7 +13,7 @@ function Register() {
   const handleRegister = async (e) => {
     e.preventDefault()
     try {
-      const res = await fetch(`https://cartrabbit-6qz5.onrender.com/api/auth/login`, {
+      const res = await fetch(`https://cartrabbit-1-p9a2.onrender.com/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, role }),

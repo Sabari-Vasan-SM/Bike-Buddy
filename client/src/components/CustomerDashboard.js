@@ -64,8 +64,8 @@ function CustomerDashboard() {
       const loadData = async () => {
         try {
           const [bookingsRes, servicesRes] = await Promise.all([
-            fetch(`https://cartrabbit-6qz5.onrender.com/api/bookings?email=${user.email}`),
-            fetch("https://cartrabbit-6qz5.onrender.com/api/services"),
+            fetch(`https://cartrabbit-1-p9a2.onrender.com/api/bookings?email=${user.email}`),
+            fetch("https://cartrabbit-1-p9a2.onrender.com/api/services"),
           ])
           setBookings(await bookingsRes.json())
           setServices(await servicesRes.json())
@@ -112,7 +112,7 @@ function CustomerDashboard() {
     }
 
     try {
-      const res = await fetch("https://cartrabbit-6qz5.onrender.com/api/bookings", {
+      const res = await fetch("https://cartrabbit-1-p9a2.onrender.com/api/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(booking),
