@@ -228,7 +228,7 @@ function CustomerDashboard() {
               <option value="">Choose a service</option>
               {services.map((service) => (
                 <option key={service._id} value={service.name}>
-                  {service.name} (${service.price}, {service.duration} hrs)
+                  {service.name} ( ₹ {service.price}, {service.duration} hrs)
                 </option>
               ))}
             </select>
@@ -274,7 +274,7 @@ function CustomerDashboard() {
                   </div>
                   <div className="booking-details">
                     <span>📅 {booking.bookingDate}</span>
-                    <span>💰 ${booking.serviceDetails?.price || "0"}</span>
+                    <span>💰  ₹ {booking.serviceDetails?.price || "0"}</span>
                     <span>⏱️ {booking.serviceDetails?.duration || "0"} hrs</span>
                   </div>
                   <div className="booking-actions">
@@ -422,7 +422,7 @@ function CustomerDashboard() {
                       {selectedBookingDetails.bookingDate}
                     </Typography>
                     <Typography variant="body2" fontWeight="bold">
-                      ${selectedBookingDetails.serviceDetails?.price || "0"}
+                       ₹ {selectedBookingDetails.serviceDetails?.price || "0"}
                     </Typography>
                   </Stack>
                 </Paper>
