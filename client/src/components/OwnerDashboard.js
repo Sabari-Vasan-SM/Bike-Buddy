@@ -2,22 +2,16 @@
 
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { Typography, Button, Chip, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material"
 import {
-  Card,
-  CardContent,
-  Typography,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
-  TextField,
-  Button,
-  Chip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-} from "@mui/material"
+  Dashboard as DashboardIcon,
+  Build as BuildIcon,
+  Assignment as AssignmentIcon,
+  GetApp as ExportIcon,
+  Add as AddIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+} from "@mui/icons-material"
 
 function OwnerDashboard() {
   const navigate = useNavigate()
@@ -33,7 +27,19 @@ function OwnerDashboard() {
   })
   const [editingService, setEditingService] = useState(null)
   const [selectedBooking, setSelectedBooking] = useState(null)
-  const [searchTerm, setSearchTerm] = useState("") // New state for search
+  const [searchTerm, setSearchTerm] = useState("")
+  const [isLoading, setIsLoading] = useState(true)
+
+  const showNotification = (message, type = "success") => {
+    const notification = document.createElement("div")
+    notification.className = `notification ${type}`
+    notification.textContent = message
+    document.body.appendChild(notification)
+
+    setTimeout(() => {
+      notification.remove()
+    }, 4000)
+  }
 
   useEffect(() => {
     if (!user || user.role !== "owner") {
@@ -53,6 +59,9 @@ function OwnerDashboard() {
           console.error("Failed to load data:", err)
           setBookings([])
           setServices([])
+          showNotification("Failed to load data. Please refresh the page.", "error")
+        } finally {
+          setIsLoading(false)
         }
       }
       loadData()
@@ -67,23 +76,19 @@ function OwnerDashboard() {
         body: JSON.stringify({ status: newStatus }),
       })
       if (res.ok) {
-        setBookings((bookings) =>
-          bookings.map(
-            (b) => (b._id === id ? { ...b, status: newStatus } : b),
-          ),
-        )
-        // Email will now be sent by backend
+        setBookings((bookings) => bookings.map((b) => (b._id === id ? { ...b, status: newStatus } : b)))
+        showNotification(`Booking status updated to ${newStatus}`, "success")
       } else {
-        alert("Failed to update booking status")
+        showNotification("Failed to update booking status", "error")
       }
     } catch (err) {
-      alert("Server error. Please try again later.")
+      showNotification("Server error. Please try again later.", "error")
     }
   }
 
   const handleAddService = async () => {
     if (!newService.name || !newService.price || !newService.duration) {
-      alert("Please fill all required service fields")
+      showNotification("Please fill all required service fields", "warning")
       return
     }
     try {
@@ -96,32 +101,33 @@ function OwnerDashboard() {
         const created = await res.json()
         setServices((prev) => [...prev, created])
         setNewService({ name: "", price: "", duration: "", description: "" })
+        showNotification("Service added successfully!", "success")
       } else {
         const errorText = await res.text()
-        alert("Failed to add service: " + errorText)
+        showNotification("Failed to add service: " + errorText, "error")
       }
     } catch (err) {
-      alert("Server error. Please try again later. " + (err?.message || ""))
+      showNotification("Server error. Please try again later.", "error")
     }
   }
 
   const handleUpdateService = async () => {
     try {
       const res = await fetch(`https://cartrabbit-6qz5.onrender.com/api/services/${editingService._id}`, {
-        // Use _id
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(editingService),
       })
       if (res.ok) {
         const updated = await res.json()
-        setServices(services.map((s) => (s._id === updated._id ? updated : s))) // Use _id
+        setServices(services.map((s) => (s._id === updated._id ? updated : s)))
         setEditingService(null)
+        showNotification("Service updated successfully!", "success")
       } else {
-        alert("Failed to update service")
+        showNotification("Failed to update service", "error")
       }
     } catch (err) {
-      alert("Server error. Please try again later.")
+      showNotification("Server error. Please try again later.", "error")
     }
   }
 
@@ -132,12 +138,13 @@ function OwnerDashboard() {
           method: "DELETE",
         })
         if (res.ok) {
-          setServices(services.filter((s) => s._id !== id)) // Use _id
+          setServices(services.filter((s) => s._id !== id))
+          showNotification("Service deleted successfully!", "success")
         } else {
-          alert("Failed to delete service")
+          showNotification("Failed to delete service", "error")
         }
       } catch (err) {
-        alert("Server error. Please try again later.")
+        showNotification("Server error. Please try again later.", "error")
       }
     }
   }
@@ -150,14 +157,33 @@ function OwnerDashboard() {
         })
         if (res.ok) {
           setBookings(bookings.filter((b) => b._id !== id))
-          setSelectedBooking(null) // Close dialog if open for deleted booking
+          setSelectedBooking(null)
+          showNotification("Booking deleted successfully!", "success")
         } else {
-          alert("Failed to delete booking")
+          showNotification("Failed to delete booking", "error")
         }
       } catch (err) {
-        alert("Server error. Please try again later.")
+        showNotification("Server error. Please try again later.", "error")
       }
     }
+  }
+
+  const exportBookings = () => {
+    const csvContent = [
+      ["Customer", "Service", "Date", "Status", "Phone", "Email"].join(","),
+      ...filteredBookings.map((b) =>
+        [b.name, b.service, b.bookingDate || b.date, b.status, b.phone, b.email].join(","),
+      ),
+    ].join("\n")
+
+    const blob = new Blob([csvContent], { type: "text/csv" })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `bookings-${new Date().toISOString().split("T")[0]}.csv`
+    a.click()
+    window.URL.revokeObjectURL(url)
+    showNotification("Bookings exported successfully!", "success")
   }
 
   const filteredBookings = bookings.filter((b) => {
@@ -183,257 +209,269 @@ function OwnerDashboard() {
   const totalServices = services.length
   const totalBookings = bookings.length
   const pendingBookings = bookings.filter((b) => b.status === "Pending").length
+  const completedBookings = bookings.filter((b) => b.status === "Completed").length
+
+  if (isLoading) {
+    return (
+      <div className="owner-dashboard-container">
+        <div style={{ textAlign: "center", padding: "60px 20px" }}>
+          <div className="loading"></div>
+          <p style={{ marginTop: "16px", color: "var(--text-secondary)" }}>Loading dashboard...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="owner-dashboard-container">
-      <Typography variant="h4" gutterBottom sx={{ color: "var(--primary-color)", fontWeight: 600 }}>
-        Owner Dashboard
-      </Typography>
-      <Typography variant="subtitle1" color="text.secondary" gutterBottom>
-        Manage services and bookings efficiently.
-      </Typography>
+      {/* Header */}
+      <div className="dashboard-header">
+        <h1 className="dashboard-title">Owner Dashboard</h1>
+        <p className="dashboard-subtitle">Manage services and bookings efficiently</p>
+      </div>
 
       {/* Dashboard Overview */}
-      <Card className="card dashboard-overview-card" sx={{ backgroundColor: "#fff" }}>
-        <Typography variant="h5" gutterBottom sx={{ color: "black", fontWeight: 600 }}>
-          Dashboard Overview
-        </Typography>
+      <div className="dashboard-overview-card">
+        <h2 className="overview-title">
+          <DashboardIcon /> Dashboard Overview
+        </h2>
         <div className="overview-grid">
-          <div className="overview-item" style={{ background: "#fff" }}>
-            <Typography variant="h6" sx={{ color: "black !important", fontWeight: 700 }}>{totalServices}</Typography>
-            <Typography variant="body1" sx={{ color: "black !important", opacity: 0.85 }}>Total Services</Typography>
+          <div className="overview-item">
+            <span className="overview-number">{totalServices}</span>
+            <span className="overview-label">Total Services</span>
           </div>
-          <div className="overview-item" style={{ background: "#fff" }}>
-            <Typography variant="h6" sx={{ color: "black !important", fontWeight: 700 }}>{totalBookings}</Typography>
-            <Typography variant="body1" sx={{ color: "black !important", opacity: 0.85 }}>Total Bookings</Typography>
+          <div className="overview-item">
+            <span className="overview-number">{totalBookings}</span>
+            <span className="overview-label">Total Bookings</span>
           </div>
-          <div className="overview-item" style={{ background: "#fff" }}>
-            <Typography variant="h6" sx={{ color: "black !important", fontWeight: 700 }}>{pendingBookings}</Typography>
-            <Typography variant="body1" sx={{ color: "black !important", opacity: 0.85 }}>Pending Bookings</Typography>
+          <div className="overview-item">
+            <span className="overview-number">{pendingBookings}</span>
+            <span className="overview-label">Pending Bookings</span>
           </div>
-        </div>
-      </Card>
-
-      <div className="owner-dashboard-grid">
-        <div>
-          <Card className="card section-card">
-            <Typography variant="h5" gutterBottom sx={{ color: "var(--text-dark)" }}>
-              Manage Services
-            </Typography>
-
-            <div className="service-form-fields">
-              <TextField
-                label="Service Name"
-                value={editingService ? editingService.name : newService.name}
-                onChange={(e) =>
-                  editingService
-                    ? setEditingService({ ...editingService, name: e.target.value })
-                    : setNewService({ ...newService, name: e.target.value })
-                }
-                required
-                fullWidth
-              />
-              <TextField
-                label="Price"
-                type="number"
-                value={editingService ? editingService.price : newService.price}
-                onChange={(e) =>
-                  editingService
-                    ? setEditingService({ ...editingService, price: e.target.value })
-                    : setNewService({ ...newService, price: e.target.value })
-                }
-                required
-                fullWidth
-              />
-              <TextField
-                label="Duration (hours)"
-                type="number"
-                value={editingService ? editingService.duration : newService.duration}
-                onChange={(e) =>
-                  editingService
-                    ? setEditingService({ ...editingService, duration: e.target.value })
-                    : setNewService({ ...newService, duration: e.target.value })
-                }
-                required
-                fullWidth
-              />
-              <TextField
-                label="Description"
-                multiline
-                rows={2}
-                value={editingService ? editingService.description : newService.description}
-                onChange={(e) =>
-                  editingService
-                    ? setEditingService({ ...editingService, description: e.target.value })
-                    : setNewService({ ...newService, description: e.target.value })
-                }
-                fullWidth
-              />
-              {editingService ? (
-                <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
-                  <Button variant="contained" onClick={handleUpdateService} sx={{ flex: 1 }}>
-                    Update Service
-                  </Button>
-                  <Button variant="outlined" onClick={() => setEditingService(null)} sx={{ flex: 1 }}>
-                    Cancel
-                  </Button>
-                </div>
-              ) : (
-                <Button variant="contained" onClick={handleAddService} sx={{ marginTop: "1rem" }}>
-                  Add New Service
-                </Button>
-              )}
-            </div>
-          </Card>
-
-          <Card className="card section-card">
-            <Typography variant="h6" gutterBottom sx={{ color: "var(--text-dark)" }}>
-              Services List
-            </Typography>
-            {services.length === 0 ? (
-              <Typography variant="body2" color="text.secondary">
-                No services added yet.
-              </Typography>
-            ) : (
-              <div>
-                {services.map((service, index) => (
-                  <Card key={service._id} className="service-card" sx={{ animationDelay: `${index * 0.05}s` }}>
-                    <CardContent className="service-card-content">
-                      <div>
-                        <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-                          {service.name}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          ${service.price} • {service.duration} hrs
-                        </Typography>
-                        {service.description && (
-                          <Typography variant="body2" color="text.secondary">
-                            {service.description}
-                          </Typography>
-                        )}
-                      </div>
-                      <div className="service-card-actions">
-                        <Button size="small" onClick={() => setEditingService(service)}>
-                          Edit
-                        </Button>
-                        <Button size="small" color="error" onClick={() => handleDeleteService(service._id)}>
-                          Delete
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </Card>
-        </div>
-
-        <div>
-          <Card className="card section-card">
-            <div className="bookings-header">
-              <Typography variant="h5" sx={{ color: "var(--text-dark)" }}>
-                Bookings
-              </Typography>
-              <FormControl sx={{ minWidth: 180 }}>
-                <InputLabel>Filter by status</InputLabel>
-                <Select value={filter} onChange={(e) => setFilter(e.target.value)} label="Filter by status">
-                  <MenuItem value="all">All Bookings</MenuItem>
-                  <MenuItem value="Pending">Pending</MenuItem>
-                  <MenuItem value="In Progress">In Progress</MenuItem>
-                  <MenuItem value="Ready for Delivery">Ready for Delivery</MenuItem>
-                  <MenuItem value="Completed">Completed</MenuItem>
-                </Select>
-              </FormControl>
-            </div>
-            {/* Search Input */}
-            <TextField
-              label="Search by Email, Name, or Service"
-              variant="outlined"
-              fullWidth
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              sx={{ mb: 2 }}
-              className="search-input"
-            />
-
-            {filteredBookings.length === 0 ? (
-              <Card sx={{ p: 2, textAlign: "center" }} className="card">
-                <Typography>No bookings found for the current filter/search.</Typography>
-              </Card>
-            ) : (
-              <div>
-                {filteredBookings.map((b, index) => (
-                  <Card
-                    key={b._id}
-                    className={`booking-card status-${b.status.replace(/\s/g, "")}`}
-                    sx={{ animationDelay: `${index * 0.05}s` }}
-                  >
-                    <CardContent className="booking-card-content">
-                      <div className="booking-card-header">
-                        <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-                          {b.email}
-                        </Typography>
-                        <Chip
-                          label={b.status}
-                          color={
-                            b.status === "Pending"
-                              ? "warning"
-                              : b.status === "In Progress"
-                                ? "info"
-                                : b.status === "Ready for Delivery"
-                                  ? "success"
-                                  : "primary"
-                          }
-                          sx={{ fontWeight: "bold" }}
-                        />
-                      </div>
-                      <Typography variant="h6" sx={{ mt: 1, color: "var(--text-dark)" }}>
-                        {b.service}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Booked on: {b.timestamp}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Service date: {b.bookingDate || b.date}
-                      </Typography>
-                      <div className="booking-card-actions">
-                        <Button size="small" variant="outlined" onClick={() => handleViewBookingDetails(b)}>
-                          View Details
-                        </Button>
-                        <FormControl sx={{ minWidth: 150 }}>
-                          <Select
-                            value={b.status}
-                            onChange={(e) =>
-                              handleStatusChange(
-                                b._id,
-                                e.target.value,
-                                b.email,
-                                b.service,
-                                b.bookingDate || b.date,
-                                b.phone,
-                              )
-                            } // Pass all necessary data
-                            size="small"
-                          >
-                            <MenuItem value="Pending">Pending</MenuItem>
-                            <MenuItem value="In Progress">In Progress</MenuItem>
-                            <MenuItem value="Ready for Delivery">Ready for Delivery</MenuItem>
-                            <MenuItem value="Completed">Completed</MenuItem>
-                          </Select>
-                        </FormControl>
-                        <Button size="small" color="error" onClick={() => handleDeleteBooking(b._id)}>
-                          Delete
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </Card>
+          <div className="overview-item">
+            <span className="overview-number">{completedBookings}</span>
+            <span className="overview-label">Completed</span>
+          </div>
         </div>
       </div>
 
+      <div className="owner-dashboard-grid">
+        <div>
+          {/* Manage Services */}
+          <div className="section-card">
+            <h2 className="section-title">
+              <BuildIcon /> Manage Services
+            </h2>
+
+            <div className="service-form-fields">
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Service Name</label>
+                  <input
+                    className="form-input"
+                    placeholder="Enter service name"
+                    value={editingService ? editingService.name : newService.name}
+                    onChange={(e) =>
+                      editingService
+                        ? setEditingService({ ...editingService, name: e.target.value })
+                        : setNewService({ ...newService, name: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Price ($)</label>
+                  <input
+                    className="form-input"
+                    type="number"
+                    placeholder="0.00"
+                    value={editingService ? editingService.price : newService.price}
+                    onChange={(e) =>
+                      editingService
+                        ? setEditingService({ ...editingService, price: e.target.value })
+                        : setNewService({ ...newService, price: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Duration (hours)</label>
+                  <input
+                    className="form-input"
+                    type="number"
+                    placeholder="0"
+                    value={editingService ? editingService.duration : newService.duration}
+                    onChange={(e) =>
+                      editingService
+                        ? setEditingService({ ...editingService, duration: e.target.value })
+                        : setNewService({ ...newService, duration: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Description (Optional)</label>
+                <textarea
+                  className="form-textarea"
+                  placeholder="Enter service description"
+                  value={editingService ? editingService.description : newService.description}
+                  onChange={(e) =>
+                    editingService
+                      ? setEditingService({ ...editingService, description: e.target.value })
+                      : setNewService({ ...newService, description: e.target.value })
+                  }
+                />
+              </div>
+
+              {editingService ? (
+                <div className="form-actions">
+                  <button className="btn-primary" onClick={handleUpdateService}>
+                    <EditIcon /> Update Service
+                  </button>
+                  <button className="btn-secondary" onClick={() => setEditingService(null)}>
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <button className="btn-primary" onClick={handleAddService}>
+                  <AddIcon /> Add New Service
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Services List */}
+          <div className="section-card">
+            <h3 className="section-title">Services List</h3>
+            {services.length === 0 ? (
+              <div className="empty-state">
+                <div className="empty-icon">🔧</div>
+                <h3 className="empty-title">No services added yet</h3>
+                <p className="empty-subtitle">Add your first service above</p>
+              </div>
+            ) : (
+              <div className="services-list">
+                {services.map((service) => (
+                  <div key={service._id} className="service-card">
+                    <div className="service-card-content">
+                      <div className="service-info">
+                        <h3>{service.name}</h3>
+                        <p className="service-meta">
+                          ${service.price} • {service.duration} hrs
+                        </p>
+                        {service.description && <p className="service-description">{service.description}</p>}
+                      </div>
+                      <div className="service-card-actions">
+                        <button className="btn-small btn-edit" onClick={() => setEditingService(service)}>
+                          <EditIcon /> Edit
+                        </button>
+                        <button className="btn-small btn-delete" onClick={() => handleDeleteService(service._id)}>
+                          <DeleteIcon /> Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div>
+          {/* Bookings */}
+          <div className="section-card">
+            <div className="bookings-header">
+              <h2 className="section-title">
+                <AssignmentIcon /> Bookings Management
+              </h2>
+              <div className="bookings-controls">
+                <button className="export-btn" onClick={exportBookings}>
+                  <ExportIcon /> Export CSV
+                </button>
+              </div>
+            </div>
+
+            <div className="bookings-controls">
+              <select className="filter-select" value={filter} onChange={(e) => setFilter(e.target.value)}>
+                <option value="all">All Bookings</option>
+                <option value="Pending">Pending</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Ready for Delivery">Ready for Delivery</option>
+                <option value="Completed">Completed</option>
+              </select>
+
+              <input
+                className="search-input"
+                placeholder="Search by email, name, or service..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+
+            {filteredBookings.length === 0 ? (
+              <div className="empty-state">
+                <div className="empty-icon">📋</div>
+                <h3 className="empty-title">No bookings found</h3>
+                <p className="empty-subtitle">No bookings match your current filter/search</p>
+              </div>
+            ) : (
+              <div className="bookings-list">
+                {filteredBookings.map((booking) => (
+                  <div key={booking._id} className={`booking-card status-${booking.status.replace(/\s/g, "")}`}>
+                    <div className="booking-card-content">
+                      <div className="booking-card-header">
+                        <h3 className="booking-customer">{booking.email}</h3>
+                        <span className={`status-badge status-${booking.status.toLowerCase().replace(/\s/g, "")}`}>
+                          {booking.status}
+                        </span>
+                      </div>
+                      <h4 className="booking-service">{booking.service}</h4>
+                      <div className="booking-meta">
+                        <span>📅 Booked: {booking.timestamp}</span>
+                        <span>🗓️ Service: {booking.bookingDate || booking.date}</span>
+                        <span>💰 ${booking.serviceDetails?.price || "0"}</span>
+                      </div>
+                      <div className="booking-card-actions">
+                        <div className="booking-actions-left">
+                          <button className="btn-small btn-edit" onClick={() => handleViewBookingDetails(booking)}>
+                            View Details
+                          </button>
+                          <select
+                            className="status-select"
+                            value={booking.status}
+                            onChange={(e) =>
+                              handleStatusChange(
+                                booking._id,
+                                e.target.value,
+                                booking.email,
+                                booking.service,
+                                booking.bookingDate || booking.date,
+                                booking.phone,
+                              )
+                            }
+                          >
+                            <option value="Pending">Pending</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Ready for Delivery">Ready for Delivery</option>
+                            <option value="Completed">Completed</option>
+                          </select>
+                        </div>
+                        <button className="btn-small btn-delete" onClick={() => handleDeleteBooking(booking._id)}>
+                          <DeleteIcon /> Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Booking Details Dialog */}
       <Dialog open={!!selectedBooking} onClose={handleCloseDetails} maxWidth="md" fullWidth>
         {selectedBooking && (
           <>
@@ -482,7 +520,7 @@ function OwnerDashboard() {
                   <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
                     Service Plan Details:
                   </Typography>
-                  <Typography variant="body2">Price: ₹{selectedBooking.serviceDetails.price}</Typography>
+                  <Typography variant="body2">Price: ${selectedBooking.serviceDetails.price}</Typography>
                   <Typography variant="body2">Duration: {selectedBooking.serviceDetails.duration} hours</Typography>
                   {selectedBooking.serviceDetails.description && (
                     <Typography variant="body2">Description: {selectedBooking.serviceDetails.description}</Typography>
