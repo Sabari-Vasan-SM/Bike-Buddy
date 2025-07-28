@@ -112,7 +112,12 @@
   left: 0;
 }
 
+.nav-links button:hover:before {
+  left: 0;
+}
+
 .nav-links button:hover {
+  color: #fff !important;
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
 }

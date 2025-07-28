@@ -1,6 +1,7 @@
 // "use client"
 
 import { useEffect, useState } from "react"
+import jsPDF from "jspdf"
 import { useNavigate } from "react-router-dom"
 import {
   Dialog,
@@ -168,6 +169,111 @@ function CustomerDashboard() {
     }
   }
 
+  // Download invoice as PDF
+  const handleDownloadInvoice = (booking) => {
+    const doc = new jsPDF()
+    // Green header
+    doc.setFillColor(16, 185, 129) // green
+    doc.roundedRect(0, 0, 210, 30, 0, 0, 'F')
+
+    // Add logo image (async fetch and convert to base64)
+    const logoUrl = "https://cartrabbit.io/wp-content/uploads/2025/03/cartrabbit.svg"
+    const imgWidth = 28
+    const imgHeight = 28
+    const addContent = (logoDataUrl) => {
+      if (logoDataUrl) {
+        doc.addImage(logoDataUrl, 'PNG', 10, 2, imgWidth, imgHeight)
+      }
+      doc.setFontSize(22)
+      doc.setTextColor(255, 255, 255)
+      doc.setFont('helvetica', 'bold')
+      doc.text('Cartrabbit Bike Service', 105, 18, { align: 'center' })
+      doc.setFontSize(12)
+      doc.setTextColor(255, 255, 255)
+      doc.text('INVOICE', 180, 18, { align: 'right' })
+
+      // Invoice meta
+      doc.setFont('helvetica', 'normal')
+      doc.setTextColor(60, 60, 60)
+      doc.text(`Date: ${new Date().toLocaleDateString()}`, 15, 38)
+      doc.text(`Booking ID: ${booking._id || '-'}`, 15, 46)
+
+      // Customer Details box
+      doc.setFillColor(236, 239, 241)
+      doc.roundedRect(10, 54, 90, 40, 4, 4, 'F')
+      doc.setFontSize(13)
+      doc.setTextColor(16, 185, 129)
+      doc.text('Customer Details', 15, 62)
+      doc.setFontSize(11)
+      doc.setTextColor(60, 60, 60)
+      doc.text(`Name: ${booking.name || '-'}`, 15, 70)
+      doc.text(`Email: ${booking.email || '-'}`, 15, 76)
+      doc.text(`Phone: ${booking.phone || '-'}`, 15, 82)
+      doc.text(`Address: ${booking.address || '-'}`, 15, 88)
+
+      // Service Details box
+      doc.setFillColor(232, 254, 240)
+      doc.roundedRect(110, 54, 90, 54, 4, 4, 'F')
+      doc.setFontSize(13)
+      doc.setTextColor(16, 185, 129)
+      doc.text('Service Details', 115, 62)
+      doc.setFontSize(11)
+      doc.setTextColor(60, 60, 60)
+      doc.text(`Service: ${booking.service || '-'}`, 115, 70)
+      doc.text(`Date: ${booking.bookingDate || '-'}`, 115, 76)
+      doc.text(`Price: $${booking.serviceDetails?.price || '0'}`, 115, 82)
+      doc.text(`Duration: ${booking.serviceDetails?.duration || '-'} hrs`, 115, 88)
+      if (booking.serviceDetails?.description) {
+        doc.text(`Description:`, 115, 94)
+        doc.setFontSize(10)
+        doc.text(booking.serviceDetails.description, 115, 100, { maxWidth: 80 })
+        doc.setFontSize(11)
+      }
+
+      // Status badge
+      let statusColor = [245, 158, 11] // default: yellow
+      if (booking.status === 'In Progress') statusColor = [6, 182, 212]
+      if (booking.status === 'Ready for Delivery' || booking.status === 'Completed') statusColor = [16, 185, 129]
+      doc.setFillColor(...statusColor)
+      doc.roundedRect(15, 105, 40, 12, 6, 6, 'F')
+      doc.setTextColor(255, 255, 255)
+      doc.setFontSize(11)
+      doc.text(`Status: ${booking.status || '-'}`, 35, 114, { align: 'center' })
+
+      // Thank you note
+      doc.setFontSize(12)
+      doc.setTextColor(16, 185, 129)
+      doc.text('Thank you for booking with Cartrabbit!', 15, 135)
+
+      doc.save(`Invoice_${booking._id || 'booking'}.pdf`)
+    }
+
+    // Convert SVG to PNG for jsPDF
+    fetch(logoUrl)
+      .then((res) => res.text())
+      .then((svgText) => {
+        const svg = new Blob([svgText], { type: 'image/svg+xml' })
+        const url = URL.createObjectURL(svg)
+        const img = new window.Image()
+        img.crossOrigin = 'Anonymous'
+        img.onload = function () {
+          const canvas = document.createElement('canvas')
+          canvas.width = imgWidth * 4
+          canvas.height = imgHeight * 4
+          const ctx = canvas.getContext('2d')
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+          const dataUrl = canvas.toDataURL('image/png')
+          addContent(dataUrl)
+          URL.revokeObjectURL(url)
+        }
+        img.onerror = function () {
+          addContent(null)
+        }
+        img.src = url
+      })
+      .catch(() => addContent(null))
+  }
+
   // Calculate stats
   const totalBookings = bookings.length
   const pendingBookings = bookings.filter((b) => b.status === "Pending").length
@@ -228,7 +334,7 @@ function CustomerDashboard() {
               <option value="">Choose a service</option>
               {services.map((service) => (
                 <option key={service._id} value={service.name}>
-                  {service.name} (${service.price}, {service.duration} hrs)
+                  {service.name} (₹{service.price}, {service.duration} hrs)
                 </option>
               ))}
             </select>
@@ -274,12 +380,15 @@ function CustomerDashboard() {
                   </div>
                   <div className="booking-details">
                     <span>📅 {booking.bookingDate}</span>
-                    <span>💰 ${booking.serviceDetails?.price || "0"}</span>
+                    <span>💰 ₹{booking.serviceDetails?.price || "0"}</span>
                     <span>⏱️ {booking.serviceDetails?.duration || "0"} hrs</span>
                   </div>
-                  <div className="booking-actions">
+                  <div className="booking-actions" style={{ display: "flex", gap: 8 }}>
                     <button className="view-details-btn" onClick={() => handleViewDetails(booking)}>
                       View Details
+                    </button>
+                    <button className="view-details-btn" onClick={() => handleDownloadInvoice(booking)}>
+                      Invoice
                     </button>
                   </div>
                 </div>
@@ -335,7 +444,7 @@ function CustomerDashboard() {
                 <Stack direction="row" justifyContent="space-between">
                   <Typography>{selectedService}</Typography>
                   <Typography fontWeight="bold">
-                    ${services.find((s) => s.name === selectedService)?.price || "0"}
+                     ₹{services.find((s) => s.name === selectedService)?.price || "0"}
                   </Typography>
                 </Stack>
                 <Typography variant="body2" color="text.secondary">
@@ -422,7 +531,7 @@ function CustomerDashboard() {
                       {selectedBookingDetails.bookingDate}
                     </Typography>
                     <Typography variant="body2" fontWeight="bold">
-                      ${selectedBookingDetails.serviceDetails?.price || "0"}
+                      ₹{selectedBookingDetails.serviceDetails?.price || "0"}
                     </Typography>
                   </Stack>
                 </Paper>
