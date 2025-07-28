@@ -279,7 +279,7 @@ function OwnerDashboard() {
                   />
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Price ($)</label>
+                  <label className="form-label">Price (₹)</label>
                   <input
                     className="form-input"
                     type="number"
@@ -359,7 +359,7 @@ function OwnerDashboard() {
                       <div className="service-info">
                         <h3>{service.name}</h3>
                         <p className="service-meta">
-                          ${service.price} • {service.duration} hrs
+                           ₹ {service.price} • {service.duration} hrs
                         </p>
                         {service.description && <p className="service-description">{service.description}</p>}
                       </div>
@@ -431,7 +431,7 @@ function OwnerDashboard() {
                       <div className="booking-meta">
                         <span>📅 Booked: {booking.timestamp}</span>
                         <span>🗓️ Service: {booking.bookingDate || booking.date}</span>
-                        <span>💰 ${booking.serviceDetails?.price || "0"}</span>
+                        <span>💰  ₹ {booking.serviceDetails?.price || "0"}</span>
                       </div>
                       <div className="booking-card-actions">
                         <div className="booking-actions-left">
@@ -520,7 +520,7 @@ function OwnerDashboard() {
                   <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
                     Service Plan Details:
                   </Typography>
-                  <Typography variant="body2">Price: ${selectedBooking.serviceDetails.price}</Typography>
+                  <Typography variant="body2">Price:  ₹ {selectedBooking.serviceDetails.price}</Typography>
                   <Typography variant="body2">Duration: {selectedBooking.serviceDetails.duration} hours</Typography>
                   {selectedBooking.serviceDetails.description && (
                     <Typography variant="body2">Description: {selectedBooking.serviceDetails.description}</Typography>
