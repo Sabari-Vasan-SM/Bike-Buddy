@@ -198,32 +198,30 @@ function BookService() {
         </div>
 
         {/* Booking Summary */}
-        {selectedService && bookingDate && (
-          <div className="booking-card booking-summary">
-            <h2 className="section-title">Booking Summary</h2>
-            <div className="summary-content">
-              <div className="summary-item">
-                <span className="summary-label">Service:</span>
-                <span className="summary-value">{selectedService}</span>
-              </div>
-              <div className="summary-item">
-                <span className="summary-label">Date:</span>
-                <span className="summary-value">{new Date(bookingDate).toLocaleDateString()}</span>
-              </div>
-              <div className="summary-item">
-                <span className="summary-label">Duration:</span>
-                <span className="summary-value">{selectedServiceData?.duration || 0} hours</span>
-              </div>
-              <div className="summary-item total">
-                <span className="summary-label">Total Price:</span>
-                <span className="summary-value">₹{selectedServiceData?.price || 0}</span>
-              </div>
+        <div className="booking-card booking-summary">
+          <h2 className="section-title">Booking Summary</h2>
+          <div className="summary-content">
+            <div className="summary-item">
+              <span className="summary-label">Service:</span>
+              <span className="summary-value">{selectedService || "Not selected"}</span> {/* Show default text if not selected */}
             </div>
-            <button className="confirm-booking-btn" onClick={handleOpenBookingDialog}>
-              Confirm Booking
-            </button>
+            <div className="summary-item">
+              <span className="summary-label">Date:</span>
+              <span className="summary-value">{bookingDate ? new Date(bookingDate).toLocaleDateString() : "Not selected"}</span> {/* Show default text if not selected */}
+            </div>
+            <div className="summary-item">
+              <span className="summary-label">Duration:</span>
+              <span className="summary-value">{selectedServiceData?.duration || 0} hours</span>
+            </div>
+            <div className="summary-item total">
+              <span className="summary-label">Total Price:</span>
+              <span className="summary-value">₹{selectedServiceData?.price || 0}</span>
+            </div>
           </div>
-        )}
+          <button className="confirm-booking-btn" onClick={handleOpenBookingDialog}>
+            Confirm Booking
+          </button>
+        </div>
       </div>
 
       {/* Booking Dialog */}

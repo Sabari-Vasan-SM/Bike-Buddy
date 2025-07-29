@@ -1,5 +1,6 @@
 "use client"
 
+// Import necessary modules and components
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import LoadingScreen from "../LoadingScreen"
@@ -14,8 +15,11 @@ import {
 } from "@mui/icons-material"
 
 function ServicesManagement() {
+  // Initialize navigation and user state
   const navigate = useNavigate()
   const user = JSON.parse(localStorage.getItem("user"))
+
+  // State variables for managing services and form inputs
   const [services, setServices] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [newService, setNewService] = useState({
@@ -26,6 +30,7 @@ function ServicesManagement() {
   })
   const [editingService, setEditingService] = useState(null)
 
+  // Function to display notifications
   const showNotification = (message, type = "success") => {
     const notification = document.createElement("div")
     notification.className = `notification ${type}`
@@ -37,22 +42,23 @@ function ServicesManagement() {
     }, 4000)
   }
 
+  // Load services when the component mounts
   useEffect(() => {
     if (!user || user.role !== "owner") {
-      navigate("/")
+      navigate("/") // Redirect if the user is not an owner
     } else {
       const loadServices = async () => {
         try {
           const res = await fetch("https://cartrabbit-6qz5.onrender.com/api/services")
           const servicesData = await res.json()
-          setServices(servicesData)
+          setServices(servicesData) // Set the fetched services
         } catch (err) {
           console.error("Failed to load services:", err)
           setServices([])
           showNotification("Failed to load services. Please refresh the page.", "error")
         } finally {
           setTimeout(() => {
-            setIsLoading(false)
+            setIsLoading(false) // Stop loading indicator
           }, 1500)
         }
       }
@@ -60,6 +66,7 @@ function ServicesManagement() {
     }
   }, [navigate, user])
 
+  // Function to add a new service
   const handleAddService = async () => {
     if (!newService.name || !newService.price || !newService.duration) {
       showNotification("Please fill all required service fields", "warning")
@@ -73,8 +80,8 @@ function ServicesManagement() {
       })
       if (res.ok) {
         const created = await res.json()
-        setServices((prev) => [...prev, created])
-        setNewService({ name: "", price: "", duration: "", description: "" })
+        setServices((prev) => [...prev, created]) // Add the new service to the list
+        setNewService({ name: "", price: "", duration: "", description: "" }) // Reset the form
         showNotification("Service added successfully!", "success")
       } else {
         const errorText = await res.text()
@@ -85,6 +92,7 @@ function ServicesManagement() {
     }
   }
 
+  // Function to update an existing service
   const handleUpdateService = async () => {
     try {
       const res = await fetch(`https://cartrabbit-6qz5.onrender.com/api/services/${editingService._id}`, {
@@ -94,8 +102,8 @@ function ServicesManagement() {
       })
       if (res.ok) {
         const updated = await res.json()
-        setServices(services.map((s) => (s._id === updated._id ? updated : s)))
-        setEditingService(null)
+        setServices(services.map((s) => (s._id === updated._id ? updated : s))) // Update the service in the list
+        setEditingService(null) // Exit editing mode
         showNotification("Service updated successfully!", "success")
       } else {
         showNotification("Failed to update service", "error")
@@ -105,6 +113,7 @@ function ServicesManagement() {
     }
   }
 
+  // Function to delete a service
   const handleDeleteService = async (id) => {
     if (window.confirm("Are you sure you want to delete this service?")) {
       try {
@@ -112,7 +121,7 @@ function ServicesManagement() {
           method: "DELETE",
         })
         if (res.ok) {
-          setServices(services.filter((s) => s._id !== id))
+          setServices(services.filter((s) => s._id !== id)) // Remove the service from the list
           showNotification("Service deleted successfully!", "success")
         } else {
           showNotification("Failed to delete service", "error")
@@ -123,13 +132,14 @@ function ServicesManagement() {
     }
   }
 
+  // Show loading screen while data is being fetched
   if (isLoading) {
     return <LoadingScreen type="owner" />
   }
 
   return (
     <div className="services-management">
-      {/* Header */}
+      {/* Header Section */}
       <div className="page-header">
         <button className="back-btn" onClick={() => navigate("/owner")}>
           <BackIcon />
@@ -144,7 +154,7 @@ function ServicesManagement() {
         </div>
       </div>
 
-      {/* Add New Service Form */}
+      {/* Add or Edit Service Form */}
       <div className="service-form-section">
         <h2 className="section-title">
           <AddIcon />
@@ -153,6 +163,7 @@ function ServicesManagement() {
 
         <div className="service-form">
           <div className="form-grid">
+            {/* Input fields for service details */}
             <div className="form-group">
               <label className="form-label">Service Name *</label>
               <input
@@ -235,7 +246,7 @@ function ServicesManagement() {
         </div>
       </div>
 
-      {/* Services List */}
+      {/* List of Services */}
       <div className="services-list-section">
         <h2 className="section-title">
           <BuildIcon />

@@ -61,7 +61,7 @@ function CustomerDashboard() {
           // Calculate comprehensive stats
           const totalSpent = bookingsData.reduce((sum, booking) => {
             return sum + (booking.serviceDetails?.price || 0)
-          }, 0)
+          }, 0) // Provide an initial value of 0 to handle empty arrays
 
           const completedBookings = bookingsData.filter((b) => b.status === "Completed").length
           const pendingBookings = bookingsData.filter((b) => b.status === "Pending").length
@@ -72,7 +72,7 @@ function CustomerDashboard() {
             serviceCount[booking.service] = (serviceCount[booking.service] || 0) + 1
           })
           const favoriteService =
-            Object.keys(serviceCount).reduce((a, b) => (serviceCount[a] > serviceCount[b] ? a : b)) || "N/A"
+            Object.keys(serviceCount).reduce((a, b) => (serviceCount[a] > serviceCount[b] ? a : b), "") || "N/A" // Provide an initial value of "" to handle empty arrays
 
           // Calculate average service time
           const avgServiceTime =

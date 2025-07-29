@@ -1,16 +1,19 @@
 "use client"
 
+// Import necessary modules and hooks
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 
 function Login() {
+  // State variables for managing form inputs, role, loading state, and errors
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [role, setRole] = useState("customer")
+  const [role, setRole] = useState("customer") // Default role is customer
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const navigate = useNavigate()
 
+  // Function to display notifications
   const showNotification = (message, type = "error") => {
     const notification = document.createElement("div")
     notification.className = `notification ${type}`
@@ -22,12 +25,14 @@ function Login() {
     }, 4000)
   }
 
+  // Handle login form submission
   const handleLogin = async (e) => {
     e.preventDefault()
     setIsLoading(true)
     setError("")
 
     try {
+      // Send login request to the server
       const res = await fetch(`https://cartrabbit-6qz5.onrender.com/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -36,10 +41,11 @@ function Login() {
       const data = await res.json()
 
       if (res.ok) {
+        // Save user details in localStorage
         localStorage.setItem("user", JSON.stringify({ role: data.role, email: data.email }))
         showNotification("Login successful! Welcome back.", "success")
 
-        // Show loading animation for 1.5s, then navigate
+        // Show loading animation for 1.5s, then navigate to the appropriate dashboard
         setTimeout(() => {
           if (data.role === "owner") {
             navigate("/owner")
@@ -48,11 +54,13 @@ function Login() {
           }
         }, 1500)
       } else {
+        // Handle login errors
         setError(data.message || "Invalid Credentials")
         showNotification(data.message || "Invalid Credentials", "error")
         setIsLoading(false)
       }
     } catch (err) {
+      // Handle network or server errors
       console.error("Login error:", err)
       const errorMsg = "Network or server error. Please check your connection or try again later."
       setError(errorMsg)
@@ -70,14 +78,15 @@ function Login() {
 
   return (
     <div className="login-container fade-in">
+      {/* Display user role icon */}
       <img src={iconUrl || "/placeholder.svg"} alt="User Icon" className="login-image" />
       <h2>Welcome Back</h2>
       <p className="subtitle">Sign in to your account</p>
 
       {isLoading ? (
+        // Show loading animation while logging in
         <div className="loading-animation" style={{ display: "flex", flexDirection: "column", alignItems: "center", margin: "40px 0" }}>
           <img
-          
             src={
               role === "owner"
                 ? "https://camo.githubusercontent.com/28667441bb9b0c4974a990d44cb4eeee21ab8169ea16bb9cd5de528081323383/68747470733a2f2f6d656469612e67697068792e636f6d2f6d656469612f6a534b426d4b6b766f3264505151747352312f67697068792e676966"
@@ -89,14 +98,17 @@ function Login() {
           <div style={{ fontWeight: 500, fontSize: 18, color: "#333" }}>Loading your dashboard...</div>
         </div>
       ) : (
+        // Login form
         <form onSubmit={handleLogin}>
           <div className="role-switch">
+            {/* Role selection dropdown */}
             <select value={role} onChange={(e) => setRole(e.target.value)} className="pill-select" disabled={isLoading}>
               <option value="customer">Customer</option>
               <option value="owner">Owner</option>
             </select>
           </div>
 
+          {/* Email input field */}
           <input
             type="email"
             placeholder="Enter your email"
@@ -107,6 +119,7 @@ function Login() {
             className="form-input"
           />
 
+          {/* Password input field */}
           <input
             type="password"
             placeholder="Enter your password"
@@ -117,6 +130,7 @@ function Login() {
             className="form-input"
           />
 
+          {/* Display error message if login fails */}
           {error && (
             <div
               style={{
@@ -133,12 +147,14 @@ function Login() {
             </div>
           )}
 
+          {/* Submit button */}
           <button type="submit" disabled={isLoading} className={isLoading ? "loading-button" : ""}>
             Sign In
           </button>
         </form>
       )}
 
+      {/* Footer for customer role */}
       {role === "customer" && !isLoading && (
         <div className="login-footer">
           <p>
