@@ -33,24 +33,60 @@ const Navbar = () => {
       {user && (
         <div className={`nav-links ${isMobileMenuOpen ? "active" : ""}`}>
           {user.role === "customer" && (
-            <span
-              onClick={() => {
-                navigate("/customer")
-                setIsMobileMenuOpen(false)
-              }}
-            >
-              Dashboard
-            </span>
+            <>
+              <span
+                onClick={() => {
+                  navigate("/customer")
+                  setIsMobileMenuOpen(false)
+                }}
+              >
+                Dashboard
+              </span>
+              <span
+                onClick={() => {
+                  navigate("/customer/book-service")
+                  setIsMobileMenuOpen(false)
+                }}
+              >
+                Book Service
+              </span>
+              <span
+                onClick={() => {
+                  navigate("/customer/service-history")
+                  setIsMobileMenuOpen(false)
+                }}
+              >
+                History
+              </span>
+            </>
           )}
           {user.role === "owner" && (
-            <span
-              onClick={() => {
-                navigate("/owner")
-                setIsMobileMenuOpen(false)
-              }}
-            >
-              Owner Panel
-            </span>
+            <>
+              <span
+                onClick={() => {
+                  navigate("/owner")
+                  setIsMobileMenuOpen(false)
+                }}
+              >
+                Dashboard
+              </span>
+              <span
+                onClick={() => {
+                  navigate("/owner/services")
+                  setIsMobileMenuOpen(false)
+                }}
+              >
+                Services
+              </span>
+              <span
+                onClick={() => {
+                  navigate("/owner/bookings")
+                  setIsMobileMenuOpen(false)
+                }}
+              >
+                Bookings
+              </span>
+            </>
           )}
           <button onClick={handleLogout}>Logout</button>
         </div>

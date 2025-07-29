@@ -326,3 +326,6 @@ textarea:focus {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--secondary-color);
 }
+
+/* Import LoadingScreen styles */
+@import url("./LoadingScreen.css");
