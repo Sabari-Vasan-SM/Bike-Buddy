@@ -1,83 +1,86 @@
-"use client"
+"use client";
 
 function LoadingScreen({ type = "customer" }) {
-  if (type === "owner") {
-    return (
-      <div className="loading-screen owner-loading">
-        <div className="loading-container">
-          <div className="owner-loading-animation">
-            <div className="gear-container">
-              <div className="gear gear-1">
-                <div className="gear-tooth"></div>
-                <div className="gear-tooth"></div>
-                <div className="gear-tooth"></div>
-                <div className="gear-tooth"></div>
-                <div className="gear-tooth"></div>
-                <div className="gear-tooth"></div>
-                <div className="gear-tooth"></div>
-                <div className="gear-tooth"></div>
-              </div>
-              <div className="gear gear-2">
-                <div className="gear-tooth"></div>
-                <div className="gear-tooth"></div>
-                <div className="gear-tooth"></div>
-                <div className="gear-tooth"></div>
-                <div className="gear-tooth"></div>
-                <div className="gear-tooth"></div>
-              </div>
-            </div>
-            <div className="tools-container">
-              <div className="tool wrench">🔧</div>
-              <div className="tool hammer">🔨</div>
-              <div className="tool screwdriver">🪛</div>
-            </div>
-          </div>
-          <div className="loading-text">
-            <h2>Setting up your workshop...</h2>
-            <p>Preparing tools and services</p>
-          </div>
-          <div className="loading-bar">
-            <div className="loading-progress"></div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div className="loading-screen customer-loading">
+    <div className={`loading-screen ${type}-loading`}>
       <div className="loading-container">
-        <div className="customer-loading-animation">
-          <div className="bike-container">
-            <div className="bike">
-              <div className="bike-frame"></div>
-              <div className="wheel wheel-front">
-                <div className="spoke"></div>
-                <div className="spoke"></div>
-                <div className="spoke"></div>
-                <div className="spoke"></div>
+        {type === "owner" ? (
+          <>
+            {/* Owner Loading Animation */}
+            <div className="owner-loading-animation">
+              <div className="tools-layout">
+                <div className="tool-item tool-wrench">🔧</div>
+                <div className="tool-item tool-hammer">🔨</div>
+                <div className="tool-item tool-screwdriver">🪛</div>
+                <div className="tool-item tool-pump">🪫</div>
               </div>
-              <div className="wheel wheel-back">
-                <div className="spoke"></div>
-                <div className="spoke"></div>
-                <div className="spoke"></div>
-                <div className="spoke"></div>
-              </div>
-              <div className="pedal"></div>
+
+              
             </div>
-            <div className="road"></div>
-          </div>
-        </div>
-        <div className="loading-text">
-          <h2>Loading your dashboard...</h2>
-          <p>Getting your bike services ready</p>
-        </div>
+
+            <div className="loading-text">
+              <h2>Setting Up Your Workshop</h2>
+              <p>Calibrating and syncing services</p>
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Customer Loading Animation */}
+            <div className="customer-loading-animation">
+              <div className="bike-scene">
+                <div className="bike-wrapper">
+                  <div className="bike">
+                    <div className="frame triangle"></div>
+                    <div className="frame top-tube"></div>
+                    <div className="frame down-tube"></div>
+                    <div className="frame seat-tube"></div>
+                    <div className="frame chain-stay"></div>
+                    <div className="frame seat-stay"></div>
+
+                    <div className="wheel wheel-front">
+                      <div className="rim"></div>
+                      <div className="spoke-group">
+                        {Array.from({ length: 4 }).map((_, i) => (
+                          <div key={i} className="spoke"></div>
+                        ))}
+                      </div>
+                      <div className="tire"></div>
+                    </div>
+
+                    <div className="wheel wheel-back">
+                      <div className="rim"></div>
+                      <div className="spoke-group">
+                        {Array.from({ length: 4 }).map((_, i) => (
+                          <div key={i} className="spoke"></div>
+                        ))}
+                      </div>
+                      <div className="tire"></div>
+                    </div>
+
+                    <div className="crank"></div>
+                    <div className="chain"></div>
+                    <div className="handlebars"></div>
+                    <div className="saddle"></div>
+                  </div>
+                </div>
+                <div className="road"></div>
+              </div>
+            </div>
+
+            <div className="loading-text">
+              <h2>Loading Your Dashboard</h2>
+              <p>Fetching your bike service history</p>
+            </div>
+          </>
+        )}
+
+        {/* Shared Loading Bar */}
         <div className="loading-bar">
           <div className="loading-progress"></div>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default LoadingScreen
+export default LoadingScreen;

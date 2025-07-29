@@ -91,7 +91,7 @@ function BookingsManagement() {
       })
       if (res.ok) {
         setBookings(bookings.map((b) => (b._id === id ? { ...b, status: newStatus } : b)))
-        showNotification(`Booking status updated to ${newStatus}`, "success")
+        showNotification(`Booking status updated to ${newStatus}. Email notification sent to User`, "success")
       } else {
         showNotification("Failed to update booking status", "error")
       }

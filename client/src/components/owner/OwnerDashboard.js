@@ -20,9 +20,8 @@ function OwnerDashboard() {
   // Retrieving user information from localStorage
   const user = JSON.parse(localStorage.getItem("user"))
 
-  // State variables to store bookings, services, loading status, and statistics
+  // State variables to store bookings, loading status, and statistics
   const [bookings, setBookings] = useState([])
-  const [services, setServices] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [stats, setStats] = useState({
     totalServices: 0,
@@ -53,16 +52,11 @@ function OwnerDashboard() {
     } else {
       const loadData = async () => {
         try {
-          // Fetching bookings and services data concurrently
-          const [bookingsRes, servicesRes] = await Promise.all([
-            fetch("https://cartrabbit-6qz5.onrender.com/api/bookings"),
-            fetch("https://cartrabbit-6qz5.onrender.com/api/services"),
-          ])
+          // Fetching bookings data
+          const bookingsRes = await fetch("https://cartrabbit-6qz5.onrender.com/api/bookings")
           const bookingsData = await bookingsRes.json()
-          const servicesData = await servicesRes.json()
 
           setBookings(bookingsData) // Updating bookings state
-          setServices(servicesData) // Updating services state
 
           // Calculate statistics based on fetched data
           const totalRevenue = bookingsData.reduce((sum, booking) => {
@@ -76,7 +70,7 @@ function OwnerDashboard() {
           }).length
 
           setStats({
-            totalServices: servicesData.length,
+            totalServices: 0, // No services data available
             totalBookings: bookingsData.length,
             pendingBookings: bookingsData.filter((b) => b.status === "Pending").length,
             completedBookings: bookingsData.filter((b) => b.status === "Completed").length,
@@ -87,13 +81,12 @@ function OwnerDashboard() {
           // Handle errors during data fetching
           console.error("Failed to load data:", err)
           setBookings([])
-          setServices([])
           showNotification("Failed to load data. Please refresh the page.", "error")
         } finally {
           // Set loading state to false after a delay
           setTimeout(() => {
             setIsLoading(false)
-          }, 2000)
+          }, 500)
         }
       }
       loadData()
@@ -114,7 +107,7 @@ function OwnerDashboard() {
       <div className="dashboard-hero">
         <div className="hero-content">
           <div className="hero-text">
-            <h1 className="hero-title">Welcome back, Workshop Manager! 👨‍🔧</h1>
+            <h1 className="hero-title">Welcome back, Admin! 👨‍🔧</h1>
             <p className="hero-subtitle">Manage your bike service business with ease and efficiency</p>
           </div>
           <div className="quick-actions">
@@ -162,8 +155,8 @@ function OwnerDashboard() {
               <BuildIcon />
             </div>
             <div className="stat-content">
-              <div className="stat-number">{stats.totalServices}</div>
-              <div className="stat-label">Active Services</div>
+              <div className="stat-number">{stats.completedBookings}</div>
+              <div className="stat-label">Completed</div>
             </div>
           </div>
           <div className="stat-card pending">

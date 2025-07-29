@@ -1,9 +1,10 @@
 "use client"
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 
 const Navbar = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   const user = JSON.parse(localStorage.getItem("user"))
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
@@ -16,6 +17,9 @@ const Navbar = () => {
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen)
   }
+
+  // Hide navigation buttons on the login page
+  const isLoginPage = location.pathname === "/login"
 
   return (
     <nav className="navbar">
@@ -30,7 +34,7 @@ const Navbar = () => {
         ☰
       </button>
 
-      {user && (
+      {!isLoginPage && user && (
         <div className={`nav-links ${isMobileMenuOpen ? "active" : ""}`}>
           {user.role === "customer" && (
             <>

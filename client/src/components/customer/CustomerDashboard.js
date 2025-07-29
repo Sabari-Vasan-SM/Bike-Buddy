@@ -8,14 +8,13 @@ import {
   CalendarToday as CalendarIcon,
   History as HistoryIcon,
   SupportAgent as SupportIcon,
-  Star as StarIcon,
-  TrendingUp as TrendingIcon,
   Schedule as ScheduleIcon,
   CheckCircle as CheckCircleIcon,
   AttachMoney as MoneyIcon,
   Build as BuildIcon,
 } from "@mui/icons-material"
 
+// eslint-disable-next-line no-unused-vars
 function CustomerDashboard() {
   const navigate = useNavigate()
   const user = JSON.parse(localStorage.getItem("user"))
@@ -30,6 +29,7 @@ function CustomerDashboard() {
     favoriteService: "N/A",
     avgServiceTime: 0,
   })
+  const [showAllServices, setShowAllServices] = useState(false)
 
   const showNotification = (message, type = "success") => {
     const notification = document.createElement("div")
@@ -97,7 +97,7 @@ function CustomerDashboard() {
         } finally {
           setTimeout(() => {
             setIsLoading(false)
-          }, 2000)
+          }, 500) // Reduced timeout duration to 0.5 seconds
         }
       }
       loadData()
@@ -179,85 +179,6 @@ function CustomerDashboard() {
         </div>
       </div>
 
-      {/* Dashboard Grid */}
-      <div className="customer-dashboard-grid">
-        {/* Quick Service Booking */}
-        <div className="dashboard-card quick-booking">
-          <h3 className="card-title">
-            <CalendarIcon />
-            Quick Service Booking
-          </h3>
-          <div className="quick-booking-content">
-            <p className="booking-description">
-              Book your next bike service in just a few clicks. Choose from our professional services.
-            </p>
-            <div className="popular-services">
-              <h4>Popular Services</h4>
-              <div className="service-chips">
-                {services.slice(0, 3).map((service) => (
-                  <div key={service._id} className="service-chip">
-                    <span className="service-name">{service.name}</span>
-                    <span className="service-price">₹{service.price}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <button className="book-now-btn" onClick={() => navigate("/customer/book-service")}>
-              Book Service Now
-            </button>
-          </div>
-        </div>
-
-        {/* Service Insights */}
-        <div className="dashboard-card service-insights">
-          <h3 className="card-title">
-            <TrendingIcon />
-            Your Service Insights
-          </h3>
-          <div className="insights-content">
-            <div className="insight-item">
-              <div className="insight-icon">⭐</div>
-              <div className="insight-details">
-                <div className="insight-label">Favorite Service</div>
-                <div className="insight-value">{stats.favoriteService}</div>
-              </div>
-            </div>
-            <div className="insight-item">
-              <div className="insight-icon">⏱️</div>
-              <div className="insight-details">
-                <div className="insight-label">Avg. Service Time</div>
-                <div className="insight-value">{stats.avgServiceTime}h</div>
-              </div>
-            </div>
-            <div className="insight-item">
-              <div className="insight-icon">💰</div>
-              <div className="insight-details">
-                <div className="insight-label">Avg. Spending</div>
-                <div className="insight-value">
-                  ₹{stats.totalBookings > 0 ? Math.round(stats.totalSpent / stats.totalBookings) : 0}
-                </div>
-              </div>
-            </div>
-            <div className="completion-rate">
-              <div className="rate-header">
-                <span>Service Completion Rate</span>
-                <span className="rate-percentage">
-                  {stats.totalBookings > 0 ? Math.round((stats.completedBookings / stats.totalBookings) * 100) : 0}%
-                </span>
-              </div>
-              <div className="progress-bar">
-                <div
-                  className="progress-fill"
-                  style={{
-                    width: `${stats.totalBookings > 0 ? (stats.completedBookings / stats.totalBookings) * 100 : 0}%`,
-                  }}
-                ></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Recent Activity & Upcoming Services */}
       <div className="activity-section">
         <div className="dashboard-card recent-bookings">
@@ -324,9 +245,6 @@ function CustomerDashboard() {
                       {booking.status}
                     </div>
                   </div>
-                  <div className="upcoming-actions">
-                    <button className="track-btn">Track</button>
-                  </div>
                 </div>
               ))}
             </div>
@@ -342,7 +260,7 @@ function CustomerDashboard() {
             Available Services
           </h3>
           <div className="services-grid">
-            {services.map((service) => (
+            {services.slice(0, 3).map((service) => (
               <div key={service._id} className="service-card">
                 <div className="service-header">
                   <h4 className="service-title">{service.name}</h4>
@@ -361,7 +279,42 @@ function CustomerDashboard() {
               </div>
             ))}
           </div>
+          <button className="view-more-btn" onClick={() => setShowAllServices(true)}>
+            View More
+          </button>
         </div>
+
+        {showAllServices && (
+          <div className="services-dialog">
+            <div className="dialog-overlay" onClick={() => setShowAllServices(false)}></div>
+            <div className="dialog-content">
+              <h3>All Services</h3>
+              <div className="services-grid">
+                {services.map((service) => (
+                  <div key={service._id} className="service-card">
+                    <div className="service-header">
+                      <h4 className="service-title">{service.name}</h4>
+                      <div className="service-price">₹{service.price}</div>
+                    </div>
+                    <div className="service-details">
+                      <div className="service-duration">⏱️ {service.duration}h</div>
+                      {service.description && <p className="service-description">{service.description}</p>}
+                    </div>
+                    <button
+                      className="book-service-btn"
+                      onClick={() => navigate("/customer/book-service", { state: { selectedService: service.name } })}
+                    >
+                      Book Now
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <button className="close-dialog-btn" onClick={() => setShowAllServices(false)}>
+                Close
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Support & Help Section */}
