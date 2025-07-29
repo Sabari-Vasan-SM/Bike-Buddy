@@ -45,20 +45,24 @@ function ServicesManagement() {
   // Load services when the component mounts
   useEffect(() => {
     if (!user || user.role !== "owner") {
-      navigate("/") // Redirect if the user is not an owner
+      // Redirect if the user is not an owner
+      navigate("/")
     } else {
       const loadServices = async () => {
         try {
+          // Fetch services data from the API
           const res = await fetch("https://cartrabbit-6qz5.onrender.com/api/services")
           const servicesData = await res.json()
           setServices(servicesData) // Set the fetched services
         } catch (err) {
+          // Handle errors during data fetching
           console.error("Failed to load services:", err)
           setServices([])
           showNotification("Failed to load services. Please refresh the page.", "error")
         } finally {
+          // Set loading state to false after a delay
           setTimeout(() => {
-            setIsLoading(false) // Stop loading indicator
+            setIsLoading(false)
           }, 1500)
         }
       }
@@ -69,10 +73,12 @@ function ServicesManagement() {
   // Function to add a new service
   const handleAddService = async () => {
     if (!newService.name || !newService.price || !newService.duration) {
+      // Show a warning if required fields are missing
       showNotification("Please fill all required service fields", "warning")
       return
     }
     try {
+      // Send a POST request to add a new service
       const res = await fetch("https://cartrabbit-6qz5.onrender.com/api/services", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -88,6 +94,7 @@ function ServicesManagement() {
         showNotification("Failed to add service: " + errorText, "error")
       }
     } catch (err) {
+      // Handle server errors
       showNotification("Server error. Please try again later.", "error")
     }
   }
@@ -95,6 +102,7 @@ function ServicesManagement() {
   // Function to update an existing service
   const handleUpdateService = async () => {
     try {
+      // Send a PUT request to update the service
       const res = await fetch(`https://cartrabbit-6qz5.onrender.com/api/services/${editingService._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -109,6 +117,7 @@ function ServicesManagement() {
         showNotification("Failed to update service", "error")
       }
     } catch (err) {
+      // Handle server errors
       showNotification("Server error. Please try again later.", "error")
     }
   }
@@ -117,6 +126,7 @@ function ServicesManagement() {
   const handleDeleteService = async (id) => {
     if (window.confirm("Are you sure you want to delete this service?")) {
       try {
+        // Send a DELETE request to remove the service
         const res = await fetch(`https://cartrabbit-6qz5.onrender.com/api/services/${id}`, {
           method: "DELETE",
         })
@@ -127,6 +137,7 @@ function ServicesManagement() {
           showNotification("Failed to delete service", "error")
         }
       } catch (err) {
+        // Handle server errors
         showNotification("Server error. Please try again later.", "error")
       }
     }

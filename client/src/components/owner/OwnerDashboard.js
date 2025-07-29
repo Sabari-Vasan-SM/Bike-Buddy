@@ -1,5 +1,6 @@
 "use client"
 
+// Importing necessary modules and components
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import LoadingScreen from "../LoadingScreen"
@@ -13,8 +14,13 @@ import {
 } from "@mui/icons-material"
 
 function OwnerDashboard() {
+  // Hook to navigate programmatically
   const navigate = useNavigate()
+
+  // Retrieving user information from localStorage
   const user = JSON.parse(localStorage.getItem("user"))
+
+  // State variables to store bookings, services, loading status, and statistics
   const [bookings, setBookings] = useState([])
   const [services, setServices] = useState([])
   const [isLoading, setIsLoading] = useState(true)
@@ -27,6 +33,7 @@ function OwnerDashboard() {
     todayBookings: 0,
   })
 
+  // Function to display notifications to the user
   const showNotification = (message, type = "success") => {
     const notification = document.createElement("div")
     notification.className = `notification ${type}`
@@ -38,12 +45,15 @@ function OwnerDashboard() {
     }, 4000)
   }
 
+  // useEffect to load data when the component mounts
   useEffect(() => {
     if (!user || user.role !== "owner") {
+      // Redirect to home page if user is not an owner
       navigate("/")
     } else {
       const loadData = async () => {
         try {
+          // Fetching bookings and services data concurrently
           const [bookingsRes, servicesRes] = await Promise.all([
             fetch("https://cartrabbit-6qz5.onrender.com/api/bookings"),
             fetch("https://cartrabbit-6qz5.onrender.com/api/services"),
@@ -51,10 +61,10 @@ function OwnerDashboard() {
           const bookingsData = await bookingsRes.json()
           const servicesData = await servicesRes.json()
 
-          setBookings(bookingsData)
-          setServices(servicesData)
+          setBookings(bookingsData) // Updating bookings state
+          setServices(servicesData) // Updating services state
 
-          // Calculate stats
+          // Calculate statistics based on fetched data
           const totalRevenue = bookingsData.reduce((sum, booking) => {
             return sum + (booking.serviceDetails?.price || 0)
           }, 0)
@@ -74,11 +84,13 @@ function OwnerDashboard() {
             todayBookings,
           })
         } catch (err) {
+          // Handle errors during data fetching
           console.error("Failed to load data:", err)
           setBookings([])
           setServices([])
           showNotification("Failed to load data. Please refresh the page.", "error")
         } finally {
+          // Set loading state to false after a delay
           setTimeout(() => {
             setIsLoading(false)
           }, 2000)
@@ -88,10 +100,12 @@ function OwnerDashboard() {
     }
   }, [navigate, user])
 
+  // Display a loading screen while data is being fetched
   if (isLoading) {
     return <LoadingScreen type="owner" />
   }
 
+  // Extracting the most recent bookings for display
   const recentBookings = bookings.slice(0, 5)
 
   return (
@@ -104,6 +118,7 @@ function OwnerDashboard() {
             <p className="hero-subtitle">Manage your bike service business with ease and efficiency</p>
           </div>
           <div className="quick-actions">
+            {/* Buttons for quick navigation */}
             <button className="quick-action-btn primary" onClick={() => navigate("/owner/services")}>
               <BuildIcon />
               <span>Manage Services</span>
@@ -123,6 +138,7 @@ function OwnerDashboard() {
           Business Overview
         </h2>
         <div className="stats-grid">
+          {/* Displaying various statistics */}
           <div className="stat-card revenue">
             <div className="stat-icon">
               <MoneyIcon />
@@ -209,6 +225,7 @@ function OwnerDashboard() {
             </div>
           ) : (
             <div className="activity-list">
+              {/* Displaying recent bookings */}
               {recentBookings.map((booking) => (
                 <div key={booking._id} className="activity-item">
                   <div className="activity-avatar">

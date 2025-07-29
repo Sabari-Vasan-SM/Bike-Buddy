@@ -1,5 +1,6 @@
 "use client"
 
+// Import necessary modules and hooks
 import { useEffect, useState } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import LoadingScreen from "../LoadingScreen"
@@ -15,9 +16,14 @@ import {
 } from "@mui/icons-material"
 
 function BookService() {
+  // Initialize navigation and location hooks
   const navigate = useNavigate()
   const location = useLocation()
+
+  // Retrieve user details from localStorage
   const user = JSON.parse(localStorage.getItem("user"))
+
+  // State variables for managing services, selected service, booking details, and UI states
   const [services, setServices] = useState([])
   const [selectedService, setSelectedService] = useState("")
   const [bookingDate, setBookingDate] = useState("")
@@ -29,6 +35,7 @@ function BookService() {
     address: "",
   })
 
+  // Function to display notifications
   const showNotification = (message, type = "success") => {
     const notification = document.createElement("div")
     notification.className = `notification ${type}`
@@ -40,15 +47,16 @@ function BookService() {
     }, 4000)
   }
 
+  // Load services when the component mounts
   useEffect(() => {
     if (!user || user.role !== "customer") {
-      navigate("/")
+      navigate("/") // Redirect if the user is not a customer
     } else {
       const loadServices = async () => {
         try {
           const res = await fetch("https://cartrabbit-6qz5.onrender.com/api/services")
           const servicesData = await res.json()
-          setServices(servicesData)
+          setServices(servicesData) // Set the fetched services
 
           // Set pre-selected service if passed from dashboard
           if (location.state?.selectedService) {
@@ -60,7 +68,7 @@ function BookService() {
           showNotification("Failed to load services. Please refresh the page.", "error")
         } finally {
           setTimeout(() => {
-            setIsLoading(false)
+            setIsLoading(false) // Stop loading indicator
           }, 1500)
         }
       }
@@ -68,6 +76,7 @@ function BookService() {
     }
   }, [navigate, user, location.state])
 
+  // Open the booking dialog
   const handleOpenBookingDialog = () => {
     if (!bookingDate || !selectedService) {
       showNotification("Please select a service and date", "warning")
@@ -76,13 +85,16 @@ function BookService() {
     setOpenBookingDialog(true)
   }
 
+  // Close the booking dialog
   const handleCloseBookingDialog = () => setOpenBookingDialog(false)
 
+  // Handle input changes in the booking form
   const handleBookingFormInputChange = (e) => {
     const { name, value } = e.target
     setBookingFormDetails((prev) => ({ ...prev, [name]: value }))
   }
 
+  // Submit the booking
   const handleBook = async () => {
     const selectedServiceData = services.find((s) => s.name === selectedService)
     const booking = {
@@ -106,6 +118,7 @@ function BookService() {
       })
 
       if (res.ok) {
+        // Reset form and show success notification
         setSelectedService("")
         setBookingDate("")
         setBookingFormDetails({ name: "", phone: "", address: "" })
@@ -122,6 +135,7 @@ function BookService() {
     }
   }
 
+  // Show loading screen while data is being fetched
   if (isLoading) {
     return <LoadingScreen type="customer" />
   }
@@ -130,7 +144,7 @@ function BookService() {
 
   return (
     <div className="book-service-page">
-      {/* Header */}
+      {/* Header Section */}
       <div className="page-header">
         <button className="back-btn" onClick={() => navigate("/customer")}>
           <BackIcon />
@@ -145,7 +159,7 @@ function BookService() {
         </div>
       </div>
 
-      {/* Service Selection */}
+      {/* Service Selection Section */}
       <div className="booking-section">
         <div className="booking-card service-selection">
           <h2 className="section-title">
@@ -177,7 +191,7 @@ function BookService() {
           </div>
         </div>
 
-        {/* Date Selection */}
+        {/* Date Selection Section */}
         <div className="booking-card date-selection">
           <h2 className="section-title">
             <CalendarIcon />
@@ -197,7 +211,7 @@ function BookService() {
           </div>
         </div>
 
-        {/* Booking Summary */}
+        {/* Booking Summary Section */}
         <div className="booking-card booking-summary">
           <h2 className="section-title">Booking Summary</h2>
           <div className="summary-content">
@@ -224,7 +238,7 @@ function BookService() {
         </div>
       </div>
 
-      {/* Booking Dialog */}
+      {/* Booking Dialog Section */}
       <Dialog open={openBookingDialog} onClose={handleCloseBookingDialog} fullWidth maxWidth="sm">
         <DialogTitle>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
