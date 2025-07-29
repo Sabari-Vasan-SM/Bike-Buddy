@@ -118,7 +118,7 @@ function ServiceHistory() {
     doc.setTextColor(60, 60, 60)
     doc.text(`Service: ${booking.service || "-"}`, 115, 70)
     doc.text(`Date: ${booking.bookingDate || "-"}`, 115, 76)
-    doc.text(`Price: $${booking.serviceDetails?.price || "0"}`, 115, 82)
+    doc.text(`Price: ₹${booking.serviceDetails?.price || "0"}`, 115, 82)
     doc.text(`Duration: ${booking.serviceDetails?.duration || "-"} hrs`, 115, 88)
 
     doc.save(`Invoice_${booking._id || "booking"}.pdf`)
@@ -221,7 +221,7 @@ function ServiceHistory() {
                 <div className="history-details">
                   <div className="detail-row">
                     <span className="detail-label">Price:</span>
-                    <span className="detail-value">${booking.serviceDetails?.price || 0}</span>
+                    <span className="detail-value">₹{booking.serviceDetails?.price || 0}</span>
                   </div>
                   <div className="detail-row">
                     <span className="detail-label">Duration:</span>
@@ -269,7 +269,7 @@ function ServiceHistory() {
                     <strong>Service:</strong> {selectedBooking.service}
                   </p>
                   <p>
-                    <strong>Price:</strong> ${selectedBooking.serviceDetails?.price || 0}
+                    <strong>Price:</strong> ₹{selectedBooking.serviceDetails?.price || 0}
                   </p>
                   <p>
                     <strong>Duration:</strong> {selectedBooking.serviceDetails?.duration || 0} hours

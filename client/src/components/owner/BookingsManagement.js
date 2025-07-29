@@ -253,7 +253,7 @@ function BookingsManagement() {
                 </div>
 
                 <div className="table-cell">
-                  <div className="price">${booking.serviceDetails?.price || 0}</div>
+                  <div className="price">₹{booking.serviceDetails?.price || 0}</div>
                 </div>
 
                 <div className="table-cell">
@@ -303,7 +303,7 @@ function BookingsManagement() {
                     <strong>Service:</strong> {selectedBooking.service}
                   </p>
                   <p>
-                    <strong>Price:</strong> ${selectedBooking.serviceDetails?.price || 0}
+                    <strong>Price:</strong> ₹{selectedBooking.serviceDetails?.price || 0}
                   </p>
                   <p>
                     <strong>Duration:</strong> {selectedBooking.serviceDetails?.duration || 0} hours

@@ -145,7 +145,7 @@ function CustomerDashboard() {
               <MoneyIcon />
             </div>
             <div className="stat-content">
-              <div className="stat-number">${stats.totalSpent}</div>
+              <div className="stat-number">₹{stats.totalSpent}</div>
               <div className="stat-label">Total Spent</div>
             </div>
           </div>
@@ -197,7 +197,7 @@ function CustomerDashboard() {
                 {services.slice(0, 3).map((service) => (
                   <div key={service._id} className="service-chip">
                     <span className="service-name">{service.name}</span>
-                    <span className="service-price">${service.price}</span>
+                    <span className="service-price">₹{service.price}</span>
                   </div>
                 ))}
               </div>
@@ -234,7 +234,7 @@ function CustomerDashboard() {
               <div className="insight-details">
                 <div className="insight-label">Avg. Spending</div>
                 <div className="insight-value">
-                  ${stats.totalBookings > 0 ? Math.round(stats.totalSpent / stats.totalBookings) : 0}
+                  ₹{stats.totalBookings > 0 ? Math.round(stats.totalSpent / stats.totalBookings) : 0}
                 </div>
               </div>
             </div>
@@ -287,7 +287,7 @@ function CustomerDashboard() {
                     </div>
                     <div className="timeline-details">
                       <span className="booking-date">📅 {booking.bookingDate}</span>
-                      <span className="booking-price">💰 ${booking.serviceDetails?.price || 0}</span>
+                      <span className="booking-price">💰 ₹{booking.serviceDetails?.price || 0}</span>
                     </div>
                   </div>
                 </div>
@@ -346,7 +346,7 @@ function CustomerDashboard() {
               <div key={service._id} className="service-card">
                 <div className="service-header">
                   <h4 className="service-title">{service.name}</h4>
-                  <div className="service-price">${service.price}</div>
+                  <div className="service-price">₹{service.price}</div>
                 </div>
                 <div className="service-details">
                   <div className="service-duration">⏱️ {service.duration}h</div>
@@ -382,81 +382,12 @@ function CustomerDashboard() {
                 </div>
               </div>
               <div className="support-item">
-                <div className="support-icon">💬</div>
-                <div className="support-details">
-                  <h4>Live Chat</h4>
-                  <p>Get instant help</p>
-                  <button className="chat-btn">Start Chat</button>
-                </div>
-              </div>
-              <div className="support-item">
                 <div className="support-icon">📧</div>
                 <div className="support-details">
                   <h4>Email Support</h4>
                   <p>support@cartrabbit.com</p>
                   <span className="support-hours">24/7 Response</span>
                 </div>
-              </div>
-            </div>
-            <div className="faq-section">
-              <h4>Quick Help</h4>
-              <div className="faq-links">
-                <a href="#" className="faq-link">
-                  How to track my service?
-                </a>
-                <a href="#" className="faq-link">
-                  What's included in basic tune-up?
-                </a>
-                <a href="#" className="faq-link">
-                  How to reschedule booking?
-                </a>
-                <a href="#" className="faq-link">
-                  Service warranty information
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Loyalty & Rewards */}
-      <div className="loyalty-section">
-        <div className="dashboard-card loyalty-card">
-          <h3 className="card-title">
-            <StarIcon />
-            Loyalty Rewards
-          </h3>
-          <div className="loyalty-content">
-            <div className="loyalty-status">
-              <div className="loyalty-level">
-                <span className="level-badge">Silver Member</span>
-                <span className="level-benefits">5% discount on all services</span>
-              </div>
-              <div className="loyalty-progress">
-                <div className="progress-info">
-                  <span>Progress to Gold</span>
-                  <span>{stats.totalSpent}/500</span>
-                </div>
-                <div className="progress-bar">
-                  <div
-                    className="progress-fill"
-                    style={{ width: `${Math.min((stats.totalSpent / 500) * 100, 100)}%` }}
-                  ></div>
-                </div>
-              </div>
-            </div>
-            <div className="rewards-info">
-              <div className="reward-item">
-                <span className="reward-icon">🎁</span>
-                <span>Free basic tune-up after 10 services</span>
-              </div>
-              <div className="reward-item">
-                <span className="reward-icon">⚡</span>
-                <span>Priority booking for Gold members</span>
-              </div>
-              <div className="reward-item">
-                <span className="reward-icon">💎</span>
-                <span>Exclusive discounts and offers</span>
               </div>
             </div>
           </div>

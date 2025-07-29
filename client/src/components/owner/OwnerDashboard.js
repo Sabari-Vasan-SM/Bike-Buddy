@@ -128,7 +128,7 @@ function OwnerDashboard() {
               <MoneyIcon />
             </div>
             <div className="stat-content">
-              <div className="stat-number">${stats.totalRevenue}</div>
+              <div className="stat-number">₹{stats.totalRevenue}</div>
               <div className="stat-label">Total Revenue</div>
             </div>
           </div>
@@ -217,7 +217,7 @@ function OwnerDashboard() {
                   <div className="activity-details">
                     <div className="activity-title">{booking.service}</div>
                     <div className="activity-subtitle">
-                      {booking.name || booking.email} • ${booking.serviceDetails?.price || 0}
+                      {booking.name || booking.email} • ₹{booking.serviceDetails?.price || 0}
                     </div>
                   </div>
                   <div className={`activity-status status-${booking.status.toLowerCase().replace(/\s/g, "")}`}>
@@ -230,31 +230,6 @@ function OwnerDashboard() {
           <button className="view-all-btn" onClick={() => navigate("/owner/bookings")}>
             View All Bookings
           </button>
-        </div>
-      </div>
-
-      {/* Action Cards */}
-      <div className="action-cards">
-        <div className="action-card" onClick={() => navigate("/owner/services")}>
-          <div className="action-icon">
-            <BuildIcon />
-          </div>
-          <div className="action-content">
-            <h3>Service Management</h3>
-            <p>Add, edit, or remove bike services. Set pricing and duration for each service type.</p>
-            <div className="action-arrow">→</div>
-          </div>
-        </div>
-
-        <div className="action-card" onClick={() => navigate("/owner/bookings")}>
-          <div className="action-icon">
-            <AssignmentIcon />
-          </div>
-          <div className="action-content">
-            <h3>Booking Management</h3>
-            <p>View all customer bookings, update service status, and manage your workshop queue.</p>
-            <div className="action-arrow">→</div>
-          </div>
         </div>
       </div>
     </div>

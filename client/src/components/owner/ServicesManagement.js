@@ -168,7 +168,7 @@ function ServicesManagement() {
             </div>
 
             <div className="form-group">
-              <label className="form-label">Price ($) *</label>
+              <label className="form-label">Price (₹) *</label>
               <input
                 className="form-input"
                 type="number"
@@ -254,7 +254,7 @@ function ServicesManagement() {
               <div key={service._id} className="service-card">
                 <div className="service-header">
                   <h3 className="service-name">{service.name}</h3>
-                  <div className="service-price">${service.price}</div>
+                  <div className="service-price">₹{service.price}</div>
                 </div>
 
                 <div className="service-details">

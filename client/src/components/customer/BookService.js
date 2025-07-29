@@ -161,7 +161,7 @@ function BookService() {
               >
                 <div className="service-header">
                   <h3 className="service-name">{service.name}</h3>
-                  <div className="service-price">${service.price}</div>
+                  <div className="service-price">₹{service.price}</div>
                 </div>
                 <div className="service-details">
                   <div className="service-duration">⏱️ {service.duration} hours</div>
@@ -194,15 +194,6 @@ function BookService() {
                 className="date-input"
               />
             </div>
-            <div className="time-slots">
-              <h4>Available Time Slots</h4>
-              <div className="slots-grid">
-                <div className="time-slot">9:00 AM</div>
-                <div className="time-slot">11:00 AM</div>
-                <div className="time-slot">2:00 PM</div>
-                <div className="time-slot">4:00 PM</div>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -225,7 +216,7 @@ function BookService() {
               </div>
               <div className="summary-item total">
                 <span className="summary-label">Total Price:</span>
-                <span className="summary-value">${selectedServiceData?.price || 0}</span>
+                <span className="summary-value">₹{selectedServiceData?.price || 0}</span>
               </div>
             </div>
             <button className="confirm-booking-btn" onClick={handleOpenBookingDialog}>
