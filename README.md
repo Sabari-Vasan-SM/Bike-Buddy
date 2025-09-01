@@ -1,4 +1,4 @@
-# 🚴‍♂️ Cartrabbit - Bike Service Management System
+# 🚴‍♂️ Bike Buddy !
 
 A comprehensive bike service management platform that connects customers with service providers, enabling easy booking, tracking, and management of bike services.
 
