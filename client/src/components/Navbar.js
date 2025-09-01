@@ -27,7 +27,7 @@ const Navbar = () => {
         className="navbar-brand"
         onClick={() => (user ? navigate(user.role === "customer" ? "/customer" : "/owner") : navigate("/"))}
       >
-        CartRabbit Bike Service 🚴‍♂️
+        BikeBuddy Bike Service 🚴‍♂️
       </div>
 
       <button className="mobile-menu-toggle" onClick={toggleMobileMenu}>
