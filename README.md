@@ -2,21 +2,10 @@
 
 A comprehensive bike service management platform that connects customers with service providers, enabling easy booking, tracking, and management of bike services.
 
-## 📋 Table of Contents
-- [Overview](#overview)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Installation](#installation)
-- [Usage](#usage)
-- [API Endpoints](#api-endpoints)
-- [Environment Variables](#environment-variables)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## 🎯 Overview
 
-Cartrabbit is a full-stack web application designed to streamline bike service operations. It provides separate dashboards for customers and service owners, with real-time status updates and email notifications.
+Bike Byuddy is a full-stack web application designed to streamline bike service operations. It provides separate dashboards for customers and service owners, with real-time status updates and email notifications.
 
 ### Key Highlights
 - **Role-based Access**: Separate interfaces for customers and service owners
