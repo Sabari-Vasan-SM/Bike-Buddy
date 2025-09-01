@@ -5,7 +5,7 @@ A comprehensive bike service management platform that connects customers with se
 
 ## 🎯 Overview
 
-Bike Byuddy is a full-stack web application designed to streamline bike service operations. It provides separate dashboards for customers and service owners, with real-time status updates and email notifications.
+Bike Buddy is a full-stack web application designed to streamline bike service operations. It provides separate dashboards for customers and service owners, with real-time status updates and email notifications.
 
 ### Key Highlights
 - **Role-based Access**: Separate interfaces for customers and service owners
